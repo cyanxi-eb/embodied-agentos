@@ -19,6 +19,7 @@ from agentos.sim.faults import FaultSpec, fault_suite
 from agentos.sim.scenes import SCENE_NAMES
 from agentos.types import FailureCode, WorldState
 from evaluation.instructions import INSTRUCTIONS, Instruction, stress_instructions
+from evaluation.report import _public_path
 
 
 # ---------------------------------------------------------------------------
@@ -367,7 +368,7 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
             "platform": "windows-10 (development host, no GPU)",
         },
         "config": {
-            "cache_dir": str(cache_dir),
+            "cache_dir": _public_path(cache_dir),
             "instructions": len(instructions),
             "scenes": list(scenes),
             "repeats": repeats,

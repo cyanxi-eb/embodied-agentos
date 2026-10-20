@@ -11,6 +11,36 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _public_path(value: str | Path) -> str:
+    """Project-relative POSIX path: public reports must never contain host paths."""
+    path = Path(value)
+    try:
+        return path.resolve().relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def sanitize_report(value: Any) -> Any:
+    """Recursively make report data portable (no absolute host paths)."""
+    if isinstance(value, str):
+        text = value
+        root = str(_REPO_ROOT)
+        if root in text:
+            text = text.replace(root, ".")
+        if "\\" in text and any(token in text for token in ("\\Users", "\\.cache", "\\reports", "\\demos", "\\.venv")):
+            text = text.replace("\\", "/")
+        if text.startswith("./"):
+            text = text[2:]
+        return text
+    if isinstance(value, dict):
+        return {str(key): sanitize_report(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [sanitize_report(item) for item in value]
+    return value
+
 
 def _fmt(value: Any, suffix: str = "") -> str:
     if isinstance(value, float):
@@ -69,7 +99,12 @@ def write_report(report: dict[str, Any], output_dir: str | Path = "reports") -> 
     json_path = output / f"eval_{stamp}.json"
     md_path = output / f"eval_{stamp}.md"
     chart_path = write_chart(report, output / f"eval_{stamp}.png")
-    report["report_paths"] = {"json": str(json_path), "markdown": str(md_path), "chart": chart_path}
+    report["report_paths"] = {
+        "json": _public_path(json_path),
+        "markdown": _public_path(md_path),
+        "chart": _public_path(chart_path) if chart_path else None,
+    }
+    report = sanitize_report(report)
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     md_path.write_text(render_markdown(report), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path), "chart": chart_path or ""}

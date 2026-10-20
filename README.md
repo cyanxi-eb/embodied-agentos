@@ -42,10 +42,10 @@
 | 重规划恢复率 | **100.0%**（6/6 次重规划后成功） |
 | 故障注入恢复率 | **100.0%**（20/20，4 类故障 × 5 目标） |
 | 消融：关闭 verify+replan（干净场景 / 故障注入） | 96.0% / **37.5%** |
-| 规划时延 p50 / p95 | 13.015 / 51.46 ms |
-| 技能决策时延 p50 / p95 | 0.095 / 0.194 ms |
+| 规划时延 p50 / p95 | 8.939 / 52.594 ms |
+| 技能决策时延 p50 / p95 | 0.089 / 0.168 ms |
 | 单幕仿真时长 p50 / p95 | 40.75 / 79.065 s |
-| 全量评测墙钟耗时 | 186.91 s |
+| 全量评测墙钟耗时 | 148.25 s |
 | 失败 bucket | {} |
 | 记忆命中率 | 66.67% |
 | 压力/泛化场景成功率（30 指令 × 4 类扰动） | **85.0%**（102/120） |
@@ -54,7 +54,7 @@
 | 　· noisy_perception_blocked_path | 100.0%（30 幕，重规划 0 幕） |
 | 　· paraphrased_language | 40.0%（30 幕，重规划 0 幕） |
 
-<sub>数据来源：`reports\eval_20261020_2024.json`，生成于 2026-10-20T20:23:56，主机 windows-10 (development host, no GPU)（Python 3.12.14）。本表由 `scripts/update_readme_metrics.py` 从 JSON 自动生成。</sub>
+<sub>数据来源：`reports/eval_20261020_2036.json`，生成于 2026-10-20T20:36:11，主机 windows-10 (development host, no GPU)（Python 3.12.14）。本表由 `scripts/update_readme_metrics.py` 从 JSON 自动生成。</sub>
 <!-- METRICS:END -->
 
 口径说明：
@@ -149,7 +149,7 @@ uv pip install --python .venv\Scripts\python.exe -r requirements-dev.txt
 ```bash
 cp -r ros2_ws/src/* ~/agentos_ws/src/ && cd ~/agentos_ws
 colcon build --symlink-install && source install/setup.bash
-ros2 launch agentos_bridge agentos.launch.py world:=/path/to/warehouse.sdf
+ros2 launch agentos_bridge agentos.launch.py   # 默认加载包内 worlds/warehouse.world
 ```
 
 完整步骤、话题/Action/Service 契约、QoS、world 内容与未完成项见 [`docs/ros2_integration.md`](docs/ros2_integration.md)。

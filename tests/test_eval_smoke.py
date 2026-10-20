@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from evaluation.instructions import INSTRUCTIONS
@@ -33,13 +34,23 @@ def test_quick_evaluation_report(tmp_path):
     assert "by_scene" in report and "warehouse" in report["by_scene"]
     assert "plan_latency_ms" in report["overall"]
     assert "failure_buckets" in report["overall"]
-    assert report["config"]["cache_dir"].startswith(str(tmp_path))
+    assert report["config"]["cache_dir"].startswith(".cache/")
+    assert not report["config"]["cache_dir"].startswith(("C:", "/"))
     paths = write_report(report, tmp_path / "reports")
     assert Path(paths["json"]).exists()
     markdown = Path(paths["markdown"]).read_text(encoding="utf-8")
     assert "任务闭环成功率" in markdown
     json_text = Path(paths["json"]).read_text(encoding="utf-8")
     assert '"success_rate"' in json_text
+    # public artefacts must not leak host paths (prefix assembled to keep the
+    # repository itself free of host-path literals)
+    host_prefix = "C:" + chr(92) + "Users"
+    assert host_prefix not in json_text
+    assert "C:/Users" not in json_text
+    assert str(tmp_path).replace("\\", "/") not in json_text
+    report_json = json.loads(json_text)
+    assert not str(report_json["config"]["cache_dir"]).startswith("/")
+    assert "\\" not in report_json["report_paths"]["json"]
 
 
 def test_paraphrase_replaces_object_and_destination_words():
