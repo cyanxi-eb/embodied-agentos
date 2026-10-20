@@ -328,6 +328,7 @@ class AgentRuntime:
         recorder = self._recorders.get(session_id)
         if recorder is not None:
             recorder.emit("resume_requested", decision=decision)
+            recorder.emit("resumed", decision=decision)
         started = time.perf_counter()
         result = self.graph.invoke(
             Command(resume=decision),
