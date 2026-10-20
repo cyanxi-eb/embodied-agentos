@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# local caches / runtime state (Qdrant local mode, LangGraph checkpoints, traces)
+.cache/
+.pytest_cache/
+!demos/traces/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# scratch / temp dirs (the harness may point TEMP at the repo root)
+tmp*/
+pytest-of-*/
+agentos-eval-*/
+agentos-ablation-*/
+scratch/
+reports_test/
+*.log
+
+# evaluation raw logs (reports/**/*.json is committed on purpose)
+reports/raw/
+reports/*_log.txt
+logs/
+
+# media scratch
+demos/frames/
+demos/*.mp4
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# large artifacts
+*.bag
+*.mcap

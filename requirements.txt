@@ -1,0 +1,16 @@
+# Runtime dependencies (pinned; the versions used for the measured evaluation).
+# Python 3.12 (uv venv --python 3.12 .venv)
+langgraph==0.6.11
+langgraph-checkpoint-sqlite==3.0.3
+mcp==1.30.0
+qdrant-client==1.19.1
+py-trees==2.6.0
+fastapi==0.151.0
+uvicorn==0.54.0
+starlette==1.9.0
+numpy==2.5.4
+matplotlib==3.11.2
+pillow==13.0.0
+httpx==0.28.1
+pyyaml==6.0.3
+jsonschema==4.26.0

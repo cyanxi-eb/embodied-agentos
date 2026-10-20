@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Byte-compile all Python (including ROS2-only modules)
+        run: |
+          python -m compileall -q src evaluation scripts tests
+          python -m compileall -q ros2_ws/src/agentos_bridge
+
+      - name: Run pytest
+        run: python -m pytest -q -p no:warnings
+
+      - name: Quick evaluation (fast sanity check, not the headline numbers)
+        run: python scripts/run_eval.py --quick --out reports-ci
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: reports-ci/
+          if-no-files-found: warn

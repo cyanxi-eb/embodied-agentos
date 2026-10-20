@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "embodied-agentos"
+version = "0.1.0"
+description = "Embodied AgentOS: natural-language task -> skill plan -> simulated ROS2 execution -> postcondition verification -> replanning"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "陈彦希", email = "cyanxi-eb@users.noreply.github.com" }]
+keywords = ["embodied-ai", "agent", "langgraph", "ros2", "behavior-tree", "robotics"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-timeout>=2"]
+
+[project.scripts]
+agentos-eval = "evaluation.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q --basetemp=.cache/pytest"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore:.*allowed_objects.*:UserWarning",
+]
