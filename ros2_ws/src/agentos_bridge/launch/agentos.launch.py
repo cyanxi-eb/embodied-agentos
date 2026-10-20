@@ -15,10 +15,12 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description() -> LaunchDescription:
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-    # The Gazebo world is passed explicitly (see docs/ros2_integration.md 2.2).
-    # Empty default = gz sim's default empty world, so the launch file stays
-    # runnable without the (uncommitted) warehouse world file.
-    world = LaunchConfiguration("world", default="")
+    # Warehouse world shipped with the package (SDF 1.9 XML, .world extension).
+    # Override with world:=/path/to/other.world.
+    world = LaunchConfiguration(
+        "world",
+        default=PathJoinSubstitution([FindPackageShare("agentos_bridge"), "worlds", "warehouse.world"]),
+    )
     nav2_params = PathJoinSubstitution(
         [FindPackageShare("agentos_bridge"), "config", "nav2_params.yaml"]
     )

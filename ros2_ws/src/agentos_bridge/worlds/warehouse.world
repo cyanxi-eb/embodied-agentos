@@ -1,0 +1,184 @@
+<?xml version="1.0" ?>
+<!--
+  Warehouse world for Embodied AgentOS / Gazebo Harmonic (gz sim), SDF 1.9.
+
+  Layout mirrors the deterministic 2D simulator (agentos.sim.scenes.build_warehouse):
+  12x12 m floor, four boundary walls, three shelf rows, two crate stacks and a
+  charging dock in the north-east corner.
+
+  Note: the repository ships this file as .world (SDF XML). Loading it requires a
+  Linux host with Gazebo Harmonic; the development host (Windows, no Gazebo) does
+  not execute this world - see docs/ros2_integration.md.
+-->
+<sdf version="1.9">
+  <world name="warehouse">
+
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+
+    <gravity>0 0 -9.81</gravity>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>12 12</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>12 12</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.85 0.87 0.9 1</ambient>
+            <diffuse>0.85 0.87 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Boundary walls: inner 12x12 m area, 0.15 m thick, 0.8 m high -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>6 12 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>12 0.15 0.8</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>12 0.15 0.8</size></box></geometry>
+          <material><ambient>0.55 0.58 0.62 1</ambient><diffuse>0.55 0.58 0.62 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_south">
+      <static>true</static>
+      <pose>6 0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>12 0.15 0.8</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>12 0.15 0.8</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="wall_east">
+      <static>true</static>
+      <pose>12 6 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.15 12 0.8</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.15 12 0.8</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="wall_west">
+      <static>true</static>
+      <pose>0 6 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.15 12 0.8</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.15 12 0.8</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Shelf rows (2D sim: y = 3.0 / 7.0 / 9.4, x in [2.0, 7.0], 0.8 m deep) -->
+    <model name="shelf_row_1">
+      <static>true</static>
+      <pose>4.5 3.0 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 0.8 1.2</size></box></geometry>
+          <material><ambient>0.45 0.47 0.5 1</ambient><diffuse>0.45 0.47 0.5 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="shelf_row_2">
+      <static>true</static>
+      <pose>4.5 7.0 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 0.8 1.2</size></box></geometry>
+          <material><ambient>0.45 0.47 0.5 1</ambient><diffuse>0.45 0.47 0.5 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="shelf_row_3">
+      <static>true</static>
+      <pose>4.5 9.4 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 0.8 1.2</size></box></geometry>
+          <material><ambient>0.45 0.47 0.5 1</ambient><diffuse>0.45 0.47 0.5 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Crate stacks (2D sim: (9.0,3.0)-(10.2,4.0) and (9.2,8.0)-(10.4,9.2)) -->
+    <model name="crate_stack_east_south">
+      <static>true</static>
+      <pose>9.6 3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1.2 1.0 1.0</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>1.2 1.0 1.0</size></box></geometry>
+          <material><ambient>0.62 0.52 0.38 1</ambient><diffuse>0.62 0.52 0.38 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="crate_stack_east_north">
+      <static>true</static>
+      <pose>9.8 8.6 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1.2 1.2 1.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>1.2 1.2 1.2</size></box></geometry>
+          <material><ambient>0.62 0.52 0.38 1</ambient><diffuse>0.62 0.52 0.38 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Charging dock (2D sim dock: 10.8, 10.8) -->
+    <model name="charging_dock">
+      <static>true</static>
+      <pose>10.8 10.8 0.1 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.6 0.6 0.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.6 0.6 0.2</size></box></geometry>
+          <material>
+            <ambient>1.0 0.85 0.3 1</ambient>
+            <diffuse>1.0 0.85 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

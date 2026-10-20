@@ -12,6 +12,7 @@ setup(
         ("share/" + package_name + "/launch", ["launch/agentos.launch.py"]),
         ("share/" + package_name + "/config", ["config/nav2_params.yaml"]),
         ("share/" + package_name + "/urdf", ["urdf/robot.urdf.xacro"]),
+        ("share/" + package_name + "/worlds", ["worlds/warehouse.world"]),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

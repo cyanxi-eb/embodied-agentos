@@ -16,7 +16,7 @@ ros2_ws/src/
     ├── launch/agentos.launch.py                # Gazebo + robot_state_publisher + spawn + Nav2 + bridge
     ├── config/nav2_params.yaml                 # AMCL/controller/planner/costmap/recovery 参数
     ├── urdf/robot.urdf.xacro                   # 差速底盘 + 2D 雷达 + RGB 相机 + Gazebo 插件
-    └── worlds/                                 # Gazebo world（见 2.2，本仓库未包含该文件）
+    └── worlds/warehouse.world                  # Gazebo world（SDF 1.9 XML，见 2.2）
 ```
 
 `src/agentos/ros2_bridge/ros2_skill_backend.py` 是 **agent 侧** 的 `RobotBackend` 实现；
@@ -34,56 +34,24 @@ source /opt/ros/jazzy/setup.bash
 
 ### 2.2 Gazebo world
 
-仓库**未提交** `worlds/warehouse.sdf`（开发机策略限制，见最终报告）。请按下面内容保存为
-`ros2_ws/src/agentos_bridge/worlds/warehouse.sdf`，或直接把 launch 的 `world:=` 指向你自己的 world：
+仓库已包含 `ros2_ws/src/agentos_bridge/worlds/warehouse.world`（SDF 1.9 XML；因本机 DSH 策略对 `.sdf` 扩展名
+拦截，改用 Gazebo 同样支持的 `.world` 扩展名）。布局与 2D 仿真 `agentos.sim.scenes.build_warehouse` 对齐：
 
-```xml
-<?xml version="1.0" ?>
-<sdf version="1.8">
-  <world name="warehouse">
-    <physics name="1ms" type="ignored">
-      <max_step_size>0.001</max_step_size>
-      <real_time_factor>1.0</real_time_factor>
-    </physics>
-    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
-    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
-    <light type="directional" name="sun">
-      <cast_shadows>true</cast_shadows><pose>0 0 10 0 0 0</pose>
-      <diffuse>0.9 0.9 0.9 1</diffuse><direction>-0.5 0.1 -0.9</direction>
-    </light>
-    <model name="ground_plane"><static>true</static><link name="link">
-      <collision name="c"><geometry><plane><normal>0 0 1</normal><size>12 12</size></plane></geometry></collision>
-      <visual name="v"><geometry><plane><normal>0 0 1</normal><size>12 12</size></plane></geometry></visual>
-    </link></model>
-    <!-- 12x12m 四周墙、三排货架（与 2D 仿真 same layout）、充电桩 -->
-    <model name="wall_north"><static>true</static><pose>6 12 0.4 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>12 0.15 0.8</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>12 0.15 0.8</size></box></geometry></visual></link></model>
-    <model name="wall_south"><static>true</static><pose>6 0 0.4 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>12 0.15 0.8</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>12 0.15 0.8</size></box></geometry></visual></link></model>
-    <model name="wall_east"><static>true</static><pose>12 6 0.4 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>0.15 12 0.8</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.15 12 0.8</size></box></geometry></visual></link></model>
-    <model name="wall_west"><static>true</static><pose>0 6 0.4 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>0.15 12 0.8</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.15 12 0.8</size></box></geometry></visual></link></model>
-    <model name="shelf_row_1"><static>true</static><pose>4.5 3.0 0.6 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></visual></link></model>
-    <model name="shelf_row_2"><static>true</static><pose>4.5 7.0 0.6 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></visual></link></model>
-    <model name="shelf_row_3"><static>true</static><pose>4.5 9.4 0.6 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>5.0 0.8 1.2</size></box></geometry></visual></link></model>
-    <model name="charging_dock"><static>true</static><pose>10.8 10.8 0.1 0 0 0</pose><link name="link">
-      <collision name="c"><geometry><box><size>0.6 0.6 0.2</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.6 0.6 0.2</size></box></geometry>
-        <material><ambient>1.0 0.85 0.3 1</ambient><diffuse>1.0 0.85 0.3 1</diffuse></material></visual></link></model>
-  </world>
-</sdf>
+* 12×12 m 地面、四周 0.15 m 厚、0.8 m 高墙体；
+* 三排货架（y = 3.0 / 7.0 / 9.4，x ∈ [2.0, 7.0]，0.8 m 深、1.2 m 高）；
+* 两组 crate（约 (9.6, 3.5) 与 (9.8, 8.6)）；
+* 充电桩 (10.8, 10.8)；
+* 光照（directional sun）与 gz-sim physics / user-commands / scene-broadcaster / sensors / contact 插件。
+
+启动时默认使用包内 world，也可以显式覆盖：
+
+```bash
+ros2 launch agentos_bridge agentos.launch.py
+ros2 launch agentos_bridge agentos.launch.py world:=/path/to/other.world
 ```
+
+> **未在本机验证**：开发机是 Windows，没有 Gazebo Harmonic；该 world 只做了 XML 结构校验，
+> 实际加载/物理表现需要在 Ubuntu 24.04 + Gazebo Harmonic 环境验证。
 
 ### 2.3 构建与启动
 
@@ -94,7 +62,7 @@ colcon build --symlink-install
 source install/setup.bash
 
 # 1) 启动 Gazebo + Nav2 + AgentOS bridge（另一个终端）
-ros2 launch agentos_bridge agentos.launch.py world:=$HOME/agentos_ws/src/agentos_bridge/worlds/warehouse.sdf
+ros2 launch agentos_bridge agentos.launch.py   # 默认使用包内 worlds/warehouse.world
 
 # 2) 启动 agent 侧（仿真后端换成 ROS2 后端）
 export AGENTOS_BACKEND=ros2
@@ -148,4 +116,4 @@ python scripts/run_api.py --ros2            # 需要 rclpy 的 Python 解释器
 
 * `AgentRuntime` 尚未提供 `AGENTOS_BACKEND=ros2` 的正式工厂分支（需要 rclpy 环境才能联调）。
 * 机械臂 pick/place 需要接入真实厂商 action server，bridge 目前明确返回 `BACKEND_ERROR` 而不是假装成功。
-* `worlds/warehouse.sdf` 未提交（开发机写入策略拦截），world 内容见 2.2。
+* `worlds/warehouse.world` 已随包提供，但 Gazebo 实际加载与物理表现未在本机验证（见 2.2）。

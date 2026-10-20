@@ -38,6 +38,7 @@ def test_ament_package_skeleton_is_complete():
         package / "launch" / "agentos.launch.py",
         package / "config" / "nav2_params.yaml",
         package / "urdf" / "robot.urdf.xacro",
+        package / "worlds" / "warehouse.world",
         package / "agentos_bridge" / "skill_action_server.py",
     ]
     for path in expected:
@@ -50,11 +51,24 @@ def test_ament_package_skeleton_is_complete():
     docs = REPO_ROOT / "docs" / "ros2_integration.md"
     assert docs.exists()
     docs_text = docs.read_text(encoding="utf-8")
-    assert "未运行" in docs_text or "not executed" in docs_text
-    # the Gazebo world is documented inline instead of committed (dev-host write policy)
-    assert "warehouse" + ".sdf" in docs_text
+    assert "未运行" in docs_text
+    assert "warehouse.world" in docs_text and "未在本机验证" in docs_text
     launch_text = (package / "launch" / "agentos.launch.py").read_text(encoding="utf-8")
-    assert "world" in launch_text
+    assert "warehouse.world" in launch_text
+    # the Gazebo world is real SDF 1.9 XML with the same layout as the 2D simulator
+    import xml.etree.ElementTree as ElementTree
+
+    world = ElementTree.parse(package / "worlds" / "warehouse.world").getroot()
+    assert world.tag == "sdf" and world.get("version") == "1.9"
+    world_name = world.find("world")
+    assert world_name is not None and world_name.get("name") == "warehouse"
+    model_names = {model.get("name") for model in world_name.findall("model")}
+    assert {"ground_plane", "shelf_row_1", "shelf_row_2", "shelf_row_3", "charging_dock"} <= model_names
+    plugin_names = {plugin.get("filename") for plugin in world_name.findall("plugin")}
+    assert "gz-sim-physics-system" in plugin_names
+    # setup.py must install the worlds/ directory
+    setup_text = (package / "setup.py").read_text(encoding="utf-8")
+    assert "worlds/warehouse.world" in setup_text
 
 
 def test_all_python_sources_compile():
