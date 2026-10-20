@@ -1,6 +1,6 @@
 """Deterministic hashing embedding + Qdrant local-mode memory.
 
-Why a hashing embedding instead of a downloaded model?  The development host has
+Why a hashing embedding instead of a downloaded model?  This offline workstation has
 no GPU and the evaluation must be reproducible offline.  A hashing embedding is a
 real (if simple) bag-of-features vectoriser: deterministic, dependency-free, and
 good enough to retrieve "where was the red box last time" by colour/category.

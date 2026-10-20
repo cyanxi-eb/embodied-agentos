@@ -10,8 +10,8 @@ Layers (bottom-up):
 * ``agentos.memory``   Qdrant scene/task memory + SQLite session & trace store
 * ``agentos.api``      FastAPI + SSE debug console
 * ``agentos.mcp_server`` MCP stdio server exposing the skill library
-* ``agentos.ros2_bridge`` rclpy adapter (import-guarded; not run on the development host)
+* ``agentos.ros2_bridge`` rclpy adapter (import-guarded; not run on this offline workstation)
 """
 
 __version__ = "0.1.0"
-__author__ = "陈彦希"
+__author__ = "cyanxi-eb"

@@ -1,4 +1,4 @@
-"""ROS2 bridge package (import-guarded; not executed on the development host)."""
+"""ROS2 bridge package (import-guarded; not executed on this offline workstation)."""
 
 from agentos.ros2_bridge.ros2_skill_backend import (
     ROS2_AVAILABLE,

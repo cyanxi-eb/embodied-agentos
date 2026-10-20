@@ -1,0 +1,1898 @@
+{
+  "schema": "agentos-eval/v1",
+  "config": {
+    "cache_dir": ".cache/eval-tmp/eval-1be353cd",
+    "instructions": 20,
+    "scenes": [
+      "warehouse"
+    ],
+    "repeats": 1,
+    "episodes": 20,
+    "quick": false,
+    "persist_events": false,
+    "planner": "llm"
+  },
+  "overall": {
+    "episodes": 20,
+    "success": 20,
+    "success_rate": 100.0,
+    "runtime_declared_success": 20,
+    "runtime_declared_success_rate": 100.0,
+    "runtime_evaluator_mismatch": 0,
+    "replan_episodes": 1,
+    "replan_rate": 5.0,
+    "replan_recovered": 1,
+    "replan_recovery_rate": 100.0,
+    "memory_hit_episodes": 0,
+    "memory_hit_rate": 0.0,
+    "memory_success_rate": 0.0,
+    "no_memory_success_rate": 100.0,
+    "sim_time_s": {
+      "count": 20,
+      "p50": 49.3,
+      "p95": 85.205,
+      "mean": 55.06,
+      "max": 108.1
+    },
+    "wall_time_per_episode_s": {
+      "count": 20,
+      "p50": 24.496,
+      "p95": 50.021,
+      "mean": 24.983,
+      "max": 55.481
+    },
+    "plan_latency_ms": {
+      "count": 21,
+      "p50": 22892.178,
+      "p95": 42459.186,
+      "mean": 22022.598,
+      "max": 49339.484
+    },
+    "decision_latency_ms": {
+      "count": 138,
+      "p50": 0.091,
+      "p95": 0.157,
+      "mean": 0.102,
+      "max": 0.391
+    },
+    "execute_latency_ms": {
+      "count": 138,
+      "p50": 1.822,
+      "p95": 56.33,
+      "mean": 13.412,
+      "max": 99.071
+    },
+    "failure_buckets": {}
+  },
+  "by_scene": {
+    "warehouse": {
+      "episodes": 20,
+      "success": 20,
+      "success_rate": 100.0,
+      "runtime_declared_success": 20,
+      "runtime_declared_success_rate": 100.0,
+      "runtime_evaluator_mismatch": 0,
+      "replan_episodes": 1,
+      "replan_rate": 5.0,
+      "replan_recovered": 1,
+      "replan_recovery_rate": 100.0,
+      "memory_hit_episodes": 0,
+      "memory_hit_rate": 0.0,
+      "memory_success_rate": 0.0,
+      "no_memory_success_rate": 100.0,
+      "sim_time_s": {
+        "count": 20,
+        "p50": 49.3,
+        "p95": 85.205,
+        "mean": 55.06,
+        "max": 108.1
+      },
+      "wall_time_per_episode_s": {
+        "count": 20,
+        "p50": 24.496,
+        "p95": 50.021,
+        "mean": 24.983,
+        "max": 55.481
+      },
+      "plan_latency_ms": {
+        "count": 21,
+        "p50": 22892.178,
+        "p95": 42459.186,
+        "mean": 22022.598,
+        "max": 49339.484
+      },
+      "decision_latency_ms": {
+        "count": 138,
+        "p50": 0.091,
+        "p95": 0.157,
+        "mean": 0.102,
+        "max": 0.391
+      },
+      "execute_latency_ms": {
+        "count": 138,
+        "p50": 1.822,
+        "p95": 56.33,
+        "mean": 13.412,
+        "max": 99.071
+      },
+      "failure_buckets": {}
+    }
+  },
+  "by_intent": {
+    "fetch": {
+      "episodes": 15,
+      "success": 15,
+      "success_rate": 100.0,
+      "runtime_declared_success": 15,
+      "runtime_declared_success_rate": 100.0,
+      "runtime_evaluator_mismatch": 0,
+      "replan_episodes": 1,
+      "replan_rate": 6.67,
+      "replan_recovered": 1,
+      "replan_recovery_rate": 100.0,
+      "memory_hit_episodes": 0,
+      "memory_hit_rate": 0.0,
+      "memory_success_rate": 0.0,
+      "no_memory_success_rate": 100.0,
+      "sim_time_s": {
+        "count": 15,
+        "p50": 48.7,
+        "p95": 57.76,
+        "mean": 49.953,
+        "max": 58.6
+      },
+      "wall_time_per_episode_s": {
+        "count": 15,
+        "p50": 24.441,
+        "p95": 46.59,
+        "mean": 23.471,
+        "max": 55.481
+      },
+      "plan_latency_ms": {
+        "count": 16,
+        "p50": 21865.598,
+        "p95": 34946.603,
+        "mean": 20660.136,
+        "max": 42459.186
+      },
+      "decision_latency_ms": {
+        "count": 93,
+        "p50": 0.09,
+        "p95": 0.198,
+        "mean": 0.103,
+        "max": 0.391
+      },
+      "execute_latency_ms": {
+        "count": 93,
+        "p50": 1.745,
+        "p95": 59.525,
+        "mean": 14.092,
+        "max": 99.071
+      },
+      "failure_buckets": {}
+    },
+    "fetch_dock": {
+      "episodes": 1,
+      "success": 1,
+      "success_rate": 100.0,
+      "runtime_declared_success": 1,
+      "runtime_declared_success_rate": 100.0,
+      "runtime_evaluator_mismatch": 0,
+      "replan_episodes": 0,
+      "replan_rate": 0.0,
+      "replan_recovered": 0,
+      "replan_recovery_rate": 0.0,
+      "memory_hit_episodes": 0,
+      "memory_hit_rate": 0.0,
+      "memory_success_rate": 0.0,
+      "no_memory_success_rate": 100.0,
+      "sim_time_s": {
+        "count": 1,
+        "p50": 59.0,
+        "p95": 59.0,
+        "mean": 59.0,
+        "max": 59.0
+      },
+      "wall_time_per_episode_s": {
+        "count": 1,
+        "p50": 17.685,
+        "p95": 17.685,
+        "mean": 17.685,
+        "max": 17.685
+      },
+      "plan_latency_ms": {
+        "count": 1,
+        "p50": 15007.087,
+        "p95": 15007.087,
+        "mean": 15007.087,
+        "max": 15007.087
+      },
+      "decision_latency_ms": {
+        "count": 7,
+        "p50": 0.084,
+        "p95": 0.093,
+        "mean": 0.085,
+        "max": 0.096
+      },
+      "execute_latency_ms": {
+        "count": 7,
+        "p50": 3.192,
+        "p95": 44.077,
+        "mean": 15.805,
+        "max": 44.831
+      },
+      "failure_buckets": {}
+    },
+    "fetch_speak": {
+      "episodes": 2,
+      "success": 2,
+      "success_rate": 100.0,
+      "runtime_declared_success": 2,
+      "runtime_declared_success_rate": 100.0,
+      "runtime_evaluator_mismatch": 0,
+      "replan_episodes": 0,
+      "replan_rate": 0.0,
+      "replan_recovered": 0,
+      "replan_recovery_rate": 0.0,
+      "memory_hit_episodes": 0,
+      "memory_hit_rate": 0.0,
+      "memory_success_rate": 0.0,
+      "no_memory_success_rate": 100.0,
+      "sim_time_s": {
+        "count": 2,
+        "p50": 50.4,
+        "p95": 52.92,
+        "mean": 50.4,
+        "max": 53.2
+      },
+      "wall_time_per_episode_s": {
+        "count": 2,
+        "p50": 31.224,
+        "p95": 47.883,
+        "mean": 31.224,
+        "max": 49.734
+      },
+      "plan_latency_ms": {
+        "count": 2,
+        "p50": 30812.048,
+        "p95": 47486.74,
+        "mean": 30812.048,
+        "max": 49339.484
+      },
+      "decision_latency_ms": {
+        "count": 14,
+        "p50": 0.092,
+        "p95": 0.126,
+        "mean": 0.094,
+        "max": 0.138
+      },
+      "execute_latency_ms": {
+        "count": 14,
+        "p50": 1.591,
+        "p95": 41.729,
+        "mean": 10.751,
+        "max": 46.544
+      },
+      "failure_buckets": {}
+    },
+    "multi_fetch": {
+      "episodes": 2,
+      "success": 2,
+      "success_rate": 100.0,
+      "runtime_declared_success": 2,
+      "runtime_declared_success_rate": 100.0,
+      "runtime_evaluator_mismatch": 0,
+      "replan_episodes": 0,
+      "replan_rate": 0.0,
+      "replan_recovered": 0,
+      "replan_recovery_rate": 0.0,
+      "memory_hit_episodes": 0,
+      "memory_hit_rate": 0.0,
+      "memory_success_rate": 0.0,
+      "no_memory_success_rate": 100.0,
+      "sim_time_s": {
+        "count": 2,
+        "p50": 96.05,
+        "p95": 106.895,
+        "mean": 96.05,
+        "max": 108.1
+      },
+      "wall_time_per_episode_s": {
+        "count": 2,
+        "p50": 33.725,
+        "p95": 36.703,
+        "mean": 33.725,
+        "max": 37.034
+      },
+      "plan_latency_ms": {
+        "count": 2,
+        "p50": 27640.603,
+        "p95": 28941.251,
+        "mean": 27640.603,
+        "max": 29085.767
+      },
+      "decision_latency_ms": {
+        "count": 24,
+        "p50": 0.114,
+        "p95": 0.141,
+        "mean": 0.107,
+        "max": 0.151
+      },
+      "execute_latency_ms": {
+        "count": 24,
+        "p50": 1.954,
+        "p95": 50.109,
+        "mean": 11.631,
+        "max": 74.594
+      },
+      "failure_buckets": {}
+    }
+  },
+  "failures": [],
+  "episodes": [
+    {
+      "instruction_id": "L01",
+      "instruction": "把A区的红色盒子拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 53498,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object red/box at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.7,
+      "wall_time_s": 1.3054,
+      "plan_latencies_ms": [
+        4.047
+      ],
+      "decision_latencies_ms": [
+        0.102,
+        0.103,
+        0.084,
+        0.091,
+        0.094,
+        0.095
+      ],
+      "execute_latencies_ms": [
+        30.537,
+        2.205,
+        1.833,
+        1.1,
+        46.3,
+        16.134
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L02",
+      "instruction": "把B区的蓝色杯子拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 48180,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object blue/cup at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.1,
+      "wall_time_s": 1.4775,
+      "plan_latencies_ms": [
+        1.764
+      ],
+      "decision_latencies_ms": [
+        0.053,
+        0.09,
+        0.05,
+        0.18,
+        0.056,
+        0.053
+      ],
+      "execute_latencies_ms": [
+        41.412,
+        1.236,
+        0.736,
+        0.58,
+        10.427,
+        0.705
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L03",
+      "instruction": "把C区的绿色球拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 26033,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object green/ball at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 51.0,
+      "wall_time_s": 24.4405,
+      "plan_latencies_ms": [
+        22892.178
+      ],
+      "decision_latencies_ms": [
+        0.088,
+        0.089,
+        0.088,
+        0.097,
+        0.082,
+        0.085
+      ],
+      "execute_latencies_ms": [
+        86.787,
+        1.258,
+        2.155,
+        1.492,
+        17.864,
+        1.911
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L04",
+      "instruction": "把B区的黄色包裹拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 25577,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object yellow/package at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.1,
+      "wall_time_s": 28.1517,
+      "plan_latencies_ms": [
+        26470.68
+      ],
+      "decision_latencies_ms": [
+        0.088,
+        0.085,
+        0.09,
+        0.188,
+        0.093,
+        0.091
+      ],
+      "execute_latencies_ms": [
+        40.456,
+        1.31,
+        1.311,
+        1.606,
+        20.605,
+        1.14
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L05",
+      "instruction": "把A区的黑色工具拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 47724,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object black/tool at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 48.9,
+      "wall_time_s": 25.7029,
+      "plan_latencies_ms": [
+        20839.018
+      ],
+      "decision_latencies_ms": [
+        0.107,
+        0.239,
+        0.348,
+        0.108,
+        0.089,
+        0.087
+      ],
+      "execute_latencies_ms": [
+        30.859,
+        1.745,
+        2.187,
+        1.086,
+        38.243,
+        1.564
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L06",
+      "instruction": "把C区的白色瓶子拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 54946,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object white/bottle at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 48.7,
+      "wall_time_s": 24.5517,
+      "plan_latencies_ms": [
+        23661.43
+      ],
+      "decision_latencies_ms": [
+        0.084,
+        0.087,
+        0.092,
+        0.081,
+        0.095,
+        0.082
+      ],
+      "execute_latencies_ms": [
+        45.655,
+        1.154,
+        1.514,
+        1.507,
+        16.763,
+        1.161
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L07",
+      "instruction": "把B区的红色杯子拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 3879,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object red/cup at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 54.6,
+      "wall_time_s": 17.0876,
+      "plan_latencies_ms": [
+        15968.188
+      ],
+      "decision_latencies_ms": [
+        0.1,
+        0.118,
+        0.07,
+        0.123,
+        0.092,
+        0.099
+      ],
+      "execute_latencies_ms": [
+        33.153,
+        1.036,
+        2.042,
+        1.345,
+        26.451,
+        1.089
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L08",
+      "instruction": "把A区的蓝色盒子拿到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 55826,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object blue/box at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.8,
+      "wall_time_s": 14.2046,
+      "plan_latencies_ms": [
+        12903.888
+      ],
+      "decision_latencies_ms": [
+        0.087,
+        0.098,
+        0.09,
+        0.085,
+        0.079,
+        0.104
+      ],
+      "execute_latencies_ms": [
+        66.328,
+        1.254,
+        1.538,
+        1.599,
+        52.95,
+        8.418
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L09",
+      "instruction": "去A区把黑色工具取过来放到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 919,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object black/tool at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.0,
+      "wall_time_s": 21.589,
+      "plan_latencies_ms": [
+        20828.944
+      ],
+      "decision_latencies_ms": [
+        0.086,
+        0.088,
+        0.102,
+        0.096,
+        0.077,
+        0.083
+      ],
+      "execute_latencies_ms": [
+        29.983,
+        1.514,
+        2.411,
+        1.175,
+        63.447,
+        1.158
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L10",
+      "instruction": "帮我把B区的红色杯子放到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 59401,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object red/cup at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 47.6,
+      "wall_time_s": 42.7796,
+      "plan_latencies_ms": [
+        42459.186
+      ],
+      "decision_latencies_ms": [
+        0.117,
+        0.094,
+        0.096,
+        0.091,
+        0.086,
+        0.089
+      ],
+      "execute_latencies_ms": [
+        88.873,
+        1.551,
+        1.922,
+        1.391,
+        17.638,
+        1.059
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L11",
+      "instruction": "把C区的绿色球移到工作站台上",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 12684,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object green/ball at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 49.7,
+      "wall_time_s": 15.7649,
+      "plan_latencies_ms": [
+        15025.822
+      ],
+      "decision_latencies_ms": [
+        0.08,
+        0.057,
+        0.095,
+        0.084,
+        0.304,
+        0.09,
+        0.213
+      ],
+      "execute_latencies_ms": [
+        33.836,
+        0.805,
+        1.811,
+        1.202,
+        17.365,
+        0.671,
+        0.529
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "speak",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L12",
+      "instruction": "从B区取黄色包裹送到工作站台",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 23874,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object yellow/package at table",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 46.7,
+      "wall_time_s": 21.3408,
+      "plan_latencies_ms": [
+        20089.46
+      ],
+      "decision_latencies_ms": [
+        0.08,
+        0.101,
+        0.074,
+        0.078,
+        0.153,
+        0.078
+      ],
+      "execute_latencies_ms": [
+        56.227,
+        1.232,
+        2.372,
+        0.998,
+        15.527,
+        1.343
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L13",
+      "instruction": "把A区的红色盒子放到充电桩旁边",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 33991,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object red/box at dock",
+      "success": true,
+      "replans": 1,
+      "memory_hit": false,
+      "sim_time_s": 57.4,
+      "wall_time_s": 55.4809,
+      "plan_latencies_ms": [
+        23132.804,
+        29439.862
+      ],
+      "decision_latencies_ms": [
+        0.08,
+        0.071,
+        0.057,
+        0.128,
+        0.101,
+        0.083,
+        0.08
+      ],
+      "execute_latencies_ms": [
+        4.941,
+        16.809,
+        1.358,
+        2.607,
+        0.945,
+        40.091,
+        1.038
+      ],
+      "failure_code": "NOT_FOUND",
+      "failure_detail": "在zone_a未检测到匹配 {'color': 'red', 'category': 'box'} 的物体",
+      "fault": null,
+      "skills": [
+        {
+          "skill": "find_object",
+          "ok": false,
+          "code": "NOT_FOUND"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L14",
+      "instruction": "把B区的蓝色杯子放到充电桩旁边",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 33439,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object blue/cup at dock",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 58.6,
+      "wall_time_s": 24.7694,
+      "plan_latencies_ms": [
+        24402.494
+      ],
+      "decision_latencies_ms": [
+        0.093,
+        0.091,
+        0.088,
+        0.391,
+        0.09,
+        0.088
+      ],
+      "execute_latencies_ms": [
+        99.071,
+        1.247,
+        6.058,
+        1.117,
+        19.709,
+        1.6
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L15",
+      "instruction": "把A区的黑色工具放到充电桩旁边",
+      "intent": "fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 23322,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object black/tool at dock",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 54.4,
+      "wall_time_s": 33.424,
+      "plan_latencies_ms": [
+        32442.409
+      ],
+      "decision_latencies_ms": [
+        0.087,
+        0.106,
+        0.091,
+        0.089,
+        0.09,
+        0.088,
+        0.138
+      ],
+      "execute_latencies_ms": [
+        31.549,
+        1.303,
+        1.693,
+        2.15,
+        56.911,
+        1.139,
+        1.475
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "speak",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L16",
+      "instruction": "把B区的蓝色杯子和C区的绿色球都拿到工作站台",
+      "intent": "multi_fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 14292,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "blue/cup=True, green/ball=True",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 84.0,
+      "wall_time_s": 37.0335,
+      "plan_latencies_ms": [
+        29085.767
+      ],
+      "decision_latencies_ms": [
+        0.109,
+        0.117,
+        0.093,
+        0.103,
+        0.091,
+        0.151,
+        0.125,
+        0.132,
+        0.115,
+        0.142,
+        0.115,
+        0.114
+      ],
+      "execute_latencies_ms": [
+        74.594,
+        1.305,
+        1.904,
+        2.004,
+        11.636,
+        0.582,
+        17.152,
+        1.772,
+        4.433,
+        1.044,
+        21.955,
+        1.135
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L17",
+      "instruction": "把A区的红色盒子和A区的蓝色盒子一起送到工作站台",
+      "intent": "multi_fetch",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 61009,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "red/box=True, blue/box=True",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 108.1,
+      "wall_time_s": 30.4172,
+      "plan_latencies_ms": [
+        26195.438
+      ],
+      "decision_latencies_ms": [
+        0.106,
+        0.103,
+        0.118,
+        0.113,
+        0.115,
+        0.103,
+        0.133,
+        0.12,
+        0.055,
+        0.056,
+        0.094,
+        0.052
+      ],
+      "execute_latencies_ms": [
+        19.996,
+        1.417,
+        4.363,
+        1.119,
+        34.068,
+        1.091,
+        52.94,
+        1.508,
+        3.356,
+        0.767,
+        17.293,
+        1.711
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L18",
+      "instruction": "先把C区的白色瓶子送到工作台，再回充电桩",
+      "intent": "fetch_dock",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 15204,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object_at_zone=True(object white/bottle at table); docked=True(docked=True near_dock=True)",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 59.0,
+      "wall_time_s": 17.6847,
+      "plan_latencies_ms": [
+        15007.087
+      ],
+      "decision_latencies_ms": [
+        0.096,
+        0.087,
+        0.084,
+        0.082,
+        0.08,
+        0.084,
+        0.083
+      ],
+      "execute_latencies_ms": [
+        44.831,
+        1.704,
+        3.192,
+        0.957,
+        15.625,
+        2.01,
+        42.319
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "dock",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L19",
+      "instruction": "把A区的红色盒子拿到工作站台，然后播报“红色盒子已送达”",
+      "intent": "fetch_speak",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 58081,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object_at_zone=True(object red/box at table); spoken=True(last_spoken='红色盒子已送达')",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 47.6,
+      "wall_time_s": 49.7338,
+      "plan_latencies_ms": [
+        49339.484
+      ],
+      "decision_latencies_ms": [
+        0.097,
+        0.12,
+        0.088,
+        0.095,
+        0.09,
+        0.138,
+        0.095
+      ],
+      "execute_latencies_ms": [
+        27.796,
+        1.287,
+        1.573,
+        2.641,
+        39.136,
+        1.494,
+        1.533
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "speak",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "instruction_id": "L20",
+      "instruction": "把B区的蓝色杯子拿到工作站台，然后播报“蓝色杯子已送达”",
+      "intent": "fetch_speak",
+      "scene": "warehouse",
+      "repeat": 0,
+      "seed": 52690,
+      "status": "finished",
+      "goal_verified": true,
+      "evaluator_ok": true,
+      "goal_detail": "object_at_zone=True(object blue/cup at table); spoken=True(last_spoken='蓝色杯子已送达')",
+      "success": true,
+      "replans": 0,
+      "memory_hit": false,
+      "sim_time_s": 53.2,
+      "wall_time_s": 12.7142,
+      "plan_latencies_ms": [
+        12284.611
+      ],
+      "decision_latencies_ms": [
+        0.077,
+        0.111,
+        0.055,
+        0.086,
+        0.095,
+        0.081,
+        0.087
+      ],
+      "execute_latencies_ms": [
+        46.544,
+        1.293,
+        3.845,
+        1.124,
+        19.284,
+        1.348,
+        1.61
+      ],
+      "failure_code": null,
+      "failure_detail": null,
+      "fault": null,
+      "skills": [
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "find_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "approach_object",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "pick",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "navigate_to",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "place",
+          "ok": true,
+          "code": "OK"
+        },
+        {
+          "skill": "speak",
+          "ok": true,
+          "code": "OK"
+        }
+      ]
+    }
+  ],
+  "planner_stats": {
+    "calls": 21,
+    "cache_hits": 2,
+    "fallbacks": 0,
+    "invalid_plans": 0,
+    "api_errors": 0,
+    "prompt_tokens": 27722,
+    "completion_tokens": 22527,
+    "total_tokens": 50249
+  },
+  "wall_time_s": 504.21,
+  "episodes_total": 20,
+  "report_paths": {
+    "json": "reports/live_llm/eval_20261020_2143.json",
+    "markdown": "reports/live_llm/eval_20261020_2143.md",
+    "chart": "reports/live_llm/eval_20261020_2143.png"
+  }
+}

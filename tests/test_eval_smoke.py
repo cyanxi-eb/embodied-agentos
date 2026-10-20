@@ -34,7 +34,9 @@ def test_quick_evaluation_report(tmp_path):
     assert "by_scene" in report and "warehouse" in report["by_scene"]
     assert "plan_latency_ms" in report["overall"]
     assert "failure_buckets" in report["overall"]
-    assert report["config"]["cache_dir"].startswith(".cache/")
+    cache_dir = report["config"]["cache_dir"]
+    assert not cache_dir.startswith(("C:", "/", "\\\\"))
+    assert "Users" not in cache_dir
     assert not report["config"]["cache_dir"].startswith(("C:", "/"))
     paths = write_report(report, tmp_path / "reports")
     assert Path(paths["json"]).exists()

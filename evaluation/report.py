@@ -115,8 +115,6 @@ def render_markdown(report: dict[str, Any]) -> str:
     config = report["config"]
     lines: list[str] = []
     lines.append("# Embodied AgentOS 评测报告\n")
-    lines.append(f"- 生成时间：{report['generated_at']}")
-    lines.append(f"- 主机：{report['host']['platform']} / Python {report['host']['python']} / {report['host']['cpu_count']} 核")
     lines.append(
         f"- 规模：{config['instructions']} 条指令 × {len(config['scenes'])} 场景 × {config['repeats']} 次重复 = "
         f"{config['episodes']} 幕；故障注入 {report.get('fault_injection', {}).get('cases', 0)} 幕；"
@@ -159,8 +157,17 @@ def render_markdown(report: dict[str, Any]) -> str:
             ],
         )
     )
-    lines.append("\n> 说明：本机为 2 核 CPU、无 GPU；评测使用确定性规则规划器（离线），因此规划时延为毫秒级。")
-    lines.append("> 接入 Qwen2.5-VL / 真实 LLM 规划器时，这一段时延会由模型 API 主导，本报告不能代表那种部署形态。\n")
+    planner = report.get("config", {}).get("planner", "rule")
+    if planner == "llm":
+        lines.append(
+            "\n> 说明：本报告使用 LLM 规划器，规划时延包含模型推理时间；"
+            "技能执行、后置条件校验与重规划仍由运行时完成。\n"
+        )
+    else:
+        lines.append(
+            "\n> 说明：确定性规则规划器（离线）下规划时延为毫秒级；"
+            "换成真实 LLM 规划器时，这一段由模型 API 主导。\n"
+        )
 
     lines.append("## 2. 分场景结果\n")
     rows = []
@@ -251,10 +258,10 @@ def render_markdown(report: dict[str, Any]) -> str:
 
     stress = report.get("stress")
     if stress:
-        lines.append("\n## 7. 压力/泛化子集（30 条指令 × 3 类扰动场景 × 1 次 = 90 幕）\n")
+        lines.append("\n## 7. 压力/泛化子集（30 条指令 × 4 类扰动场景 × 1 次 = 120 幕）\n")
         lines.append(
-            "标准评测是确定性规划器 + 干净世界，因此成功率偏高；为了不让指标显得「过于完美」，"
-            "另跑一组扰动场景（同一 runner、同一评测器判定），如实报告：\n"
+            "标准评测是确定性规划器 + 干净世界，因此成功率偏高；"
+            "另跑一组扰动场景（同一 runner、同一评测器判定）：\n"
         )
         overall_stress = stress["overall"]
         lines.append(

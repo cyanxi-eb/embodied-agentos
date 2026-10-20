@@ -49,9 +49,7 @@ def build_table(report: dict) -> str:
     lines += [f"| {name} | {value} |" for name, value in rows]
     lines.append("")
     lines.append(
-        f"<sub>数据来源：`{report.get('report_paths', {}).get('json', 'reports/eval_*.json')}`，"
-        f"生成于 {report['generated_at']}，主机 {report['host']['platform']}（Python {report['host']['python']}）。"
-        "本表由 `scripts/update_readme_metrics.py` 从 JSON 自动生成。</sub>"
+        f"<sub>数据来源：`{report.get('report_paths', {}).get('json', 'reports/eval_*.json')}`。</sub>"
     )
     return "\n".join(lines)
 

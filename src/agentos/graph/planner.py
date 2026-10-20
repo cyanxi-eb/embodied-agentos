@@ -11,10 +11,12 @@ the planner decides whether a new search zone, a retry or "give up" is correct.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from agentos.graph.parser import ParsedIntent, parse_instruction
@@ -344,12 +346,32 @@ class RuleBasedPlanner(PlannerBackend):
 # ---------------------------------------------------------------------------
 # Optional LLM planner (OpenAI-compatible endpoints)
 # ---------------------------------------------------------------------------
-class LLMPlanner(PlannerBackend):
-    """Structured-output planner over any OpenAI-compatible chat endpoint.
+class _PlanRejected(ValueError):
+    """The model answered, but the answer is not a valid task graph."""
 
-    Configuration: ``AGENTOS_PLANNER_BASE_URL``, ``AGENTOS_PLANNER_API_KEY``,
-    ``AGENTOS_PLANNER_MODEL``.  Not used by tests; falls back to the rule planner
-    if the model returns an invalid plan.
+
+def _extract_json_object(text: str) -> dict[str, Any]:
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end <= start:
+        raise _PlanRejected("no JSON object in model response")
+    return json.loads(text[start : end + 1])
+
+
+class LLMPlanner(PlannerBackend):
+    """Plan-and-Act over an OpenAI-compatible chat endpoint.
+
+    Environment:
+        AGENTOS_PLANNER_API_KEY    bearer token (required)
+        AGENTOS_PLANNER_BASE_URL   default: DashScope compatible mode
+        AGENTOS_PLANNER_MODEL      default: qwen3.8-flash
+        AGENTOS_PLANNER_TIMEOUT_S  default 30
+        AGENTOS_PLANNER_THINKING=0 disable model reasoning tokens (faster/cheaper)
+        AGENTOS_PLANNER_CACHE_DIR  default .cache/llm-plans
+        AGENTOS_PLANNER_CACHE=0    disable the on-disk response cache
+
+    Any OpenAI-compatible endpoint works.  A failed request or a plan that fails
+    schema/ordering validation falls back to the deterministic rule planner and
+    is counted in ``stats`` so evaluation reports can separate the two.
     """
 
     name = "llm"
@@ -357,28 +379,59 @@ class LLMPlanner(PlannerBackend):
     def __init__(self, registry: SkillRegistry, fallback: RuleBasedPlanner | None = None) -> None:
         self.registry = registry
         self.fallback = fallback or RuleBasedPlanner(registry)
-        self.base_url = os.environ.get("AGENTOS_PLANNER_BASE_URL", "").rstrip("/")
         self.api_key = os.environ.get("AGENTOS_PLANNER_API_KEY", "")
-        self.model = os.environ.get("AGENTOS_PLANNER_MODEL", "")
-        self.timeout_s = float(os.environ.get("AGENTOS_PLANNER_TIMEOUT_S", "20"))
+        default_base = "https://dashscope.aliyuncs.com/compatible-mode/v1" if self.api_key else ""
+        self.base_url = (os.environ.get("AGENTOS_PLANNER_BASE_URL") or default_base).rstrip("/")
+        self.model = os.environ.get("AGENTOS_PLANNER_MODEL") or ("qwen3.8-flash" if self.api_key else "")
+        self.timeout_s = float(os.environ.get("AGENTOS_PLANNER_TIMEOUT_S", "30"))
+        self.cache_enabled = os.environ.get("AGENTOS_PLANNER_CACHE", "1") != "0"
+        self.cache_dir = Path(os.environ.get("AGENTOS_PLANNER_CACHE_DIR", ".cache/llm-plans"))
+        self.thinking = os.environ.get("AGENTOS_PLANNER_THINKING", "1") != "0"
         self.last_error = ""
+        self.stats: dict[str, Any] = {
+            "calls": 0,
+            "cache_hits": 0,
+            "fallbacks": 0,
+            "invalid_plans": 0,
+            "api_errors": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
 
     @property
     def available(self) -> bool:
-        return bool(self.base_url and self.model)
+        return bool(self.base_url and self.model and self.api_key)
 
+    # ------------------------------------------------------------------ public
     def plan(self, ctx: PlannerContext) -> TaskPlan:
         if not self.available:
             return self.fallback.plan(ctx)
+        self.stats["calls"] += 1
         try:
             return self._llm_plan(ctx)
-        except Exception as error:  # graceful degradation, logged for the trace
+        except _PlanRejected as error:
+            self.stats["invalid_plans"] += 1
+            self.last_error = f"invalid: {error}"
+        except Exception as error:  # network / HTTP / JSON errors
+            self.stats["api_errors"] += 1
             self.last_error = f"{type(error).__name__}: {error}"
-            return self.fallback.plan(ctx)
+        self.stats["fallbacks"] += 1
+        plan = self.fallback.plan(ctx)
+        plan.notes.append("planner_fallback=rule")
+        return plan
 
-    def _llm_plan(self, ctx: PlannerContext) -> TaskPlan:
-        import httpx
+    # ------------------------------------------------------------------ prompt
+    def _system_prompt(self) -> str:
+        return (
+            "你是机器人任务规划器。根据用户指令、场景与技能清单输出任务图 JSON，不要输出任何解释。\n"
+            '格式：{"goal": "...", "nodes": [{"node_id": "n1", "skill": "...", '
+            '"params": {...}, "depends_on": [], "purpose": "..."}]}\n'
+            "规则：node_id 从 n1 递增；depends_on 只能引用前面的节点；params 必须符合技能 schema；"
+            "只能使用给定技能名；禁止输出速度、关节、电机等底层参数。"
+        )
 
+    def _user_prompt(self, ctx: PlannerContext) -> str:
         skills = [
             {
                 "name": skill.name,
@@ -387,56 +440,105 @@ class LLMPlanner(PlannerBackend):
             }
             for skill in self.registry.all()
         ]
-        system = (
-            "你是机器人的任务规划器。只能使用给定的技能与 JSON Schema 参数，"
-            "输出任务图 JSON：{\"goal\": str, \"nodes\": [{\"node_id\": str, \"skill\": str, "
-            "\"params\": object, \"depends_on\": [str], \"purpose\": str}]}。"
-            "禁止输出速度、电机、关节等底层控制参数。"
-        )
-        user = json.dumps(
-            {
-                "instruction": ctx.instruction,
-                "scene": {"name": ctx.scene.name, "zones": ctx.scene.zones, "dock": ctx.scene.dock},
-                "world": ctx.world.snapshot(),
-                "memory": ctx.memory_hit.to_dict() if ctx.memory_hit else None,
-                "skills": skills,
-            },
-            ensure_ascii=False,
-        )
+        payload = {
+            "instruction": ctx.instruction,
+            "scene": {"name": ctx.scene.name, "zones": ctx.scene.zones, "dock": ctx.scene.dock},
+            "world": ctx.world.snapshot(),
+            "memory": ctx.memory_hit.to_dict() if ctx.memory_hit else None,
+            "skills": skills,
+        }
+        return json.dumps(payload, ensure_ascii=False)
+
+    def _chat(self, system: str, user: str) -> tuple[str, bool]:
+        key = hashlib.sha256(
+            json.dumps(
+                {"model": self.model, "system": system, "user": user},
+                ensure_ascii=False,
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        cache_file = self.cache_dir / f"{key}.json"
+        if self.cache_enabled and cache_file.exists():
+            try:
+                data = json.loads(cache_file.read_text(encoding="utf-8"))
+                self.stats["cache_hits"] += 1
+                return str(data["content"]), True
+            except Exception:
+                pass
+
+        import httpx
+
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
-        response = httpx.post(
-            f"{self.base_url}/chat/completions",
-            headers=headers,
-            json={
-                "model": self.model,
-                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-                "temperature": 0.0,
-                "response_format": {"type": "json_object"},
-            },
-            timeout=self.timeout_s,
-        )
-        response.raise_for_status()
-        content = response.json()["choices"][0]["message"]["content"]
-        start, end = content.find("{"), content.rfind("}")
-        data = json.loads(content[start : end + 1])
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.0,
+            "response_format": {"type": "json_object"},
+            "enable_thinking": self.thinking,
+        }
+        last_error: Exception | None = None
+        for _attempt in range(2):
+            try:
+                response = httpx.post(
+                    f"{self.base_url}/chat/completions",
+                    headers=headers,
+                    json=payload,
+                    timeout=self.timeout_s,
+                )
+                if response.status_code == 400:
+                    dropped = False
+                    for field in ("response_format", "enable_thinking"):
+                        if field in response.text and field in payload:
+                            payload.pop(field, None)
+                            dropped = True
+                    if dropped:
+                        continue
+                response.raise_for_status()
+                body = response.json()
+                content = body["choices"][0]["message"]["content"]
+                usage = body.get("usage") or {}
+                for name in ("prompt_tokens", "completion_tokens", "total_tokens"):
+                    self.stats[name] += int(usage.get(name, 0))
+                if self.cache_enabled:
+                    self.cache_dir.mkdir(parents=True, exist_ok=True)
+                    cache_file.write_text(
+                        json.dumps({"content": content}, ensure_ascii=False), encoding="utf-8"
+                    )
+                return content, False
+            except Exception as error:  # retry once on transient failures
+                last_error = error
+        raise RuntimeError(f"planner API failed: {last_error}")
+
+    def _llm_plan(self, ctx: PlannerContext) -> TaskPlan:
+        content, cached = self._chat(self._system_prompt(), self._user_prompt(ctx))
+        data = _extract_json_object(content)
         nodes = [
             TaskNode(
                 node_id=str(node["node_id"]),
                 skill=str(node["skill"]),
                 params=dict(node.get("params") or {}),
-                depends_on=list(node.get("depends_on") or []),
+                depends_on=[str(dep) for dep in (node.get("depends_on") or [])],
                 purpose=str(node.get("purpose", "llm")),
             )
             for node in data.get("nodes", [])
         ]
-        plan = TaskPlan(goal=str(data.get("goal", ctx.instruction)), nodes=nodes, notes=["planner=llm"])
+        if not nodes:
+            raise _PlanRejected("model returned an empty plan")
+        plan = TaskPlan(
+            goal=str(data.get("goal") or ctx.instruction),
+            nodes=nodes,
+            notes=["planner=llm"] + (["llm_cache_hit"] if cached else []),
+        )
         from agentos.graph.task_graph import validate_plan
 
         validation = validate_plan(plan, self.registry)
         if not validation.ok:
-            raise ValueError(f"LLM plan failed validation: {validation.errors[:3]}")
+            raise _PlanRejected(f"validation failed: {validation.errors[:3]}")
         return plan
 
 

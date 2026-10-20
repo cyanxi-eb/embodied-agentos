@@ -1,11 +1,11 @@
 """ROS2 (rclpy) skill backend - the real-robot adapter.
 
-Import-guarded on purpose: the development host is Windows without ROS2, so
+Import-guarded on purpose: this offline workstation has no ROS2, so
 ``ROS2_AVAILABLE`` is ``False`` here and importing this module must never fail.
 On Ubuntu 24.04 + ROS2 Jazzy it is the backend used instead of
 ``SimSkillBackend``; the agent runtime and skill layer do not change.
 
-Not executed on the development host.  See ``docs/ros2_integration.md``.
+Not executed on this offline workstation.  See ``docs/ros2_integration.md``.
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ try:  # pragma: no cover - exercised only on a ROS2 host
         AGENTOS_INTERFACES_AVAILABLE = False
 
     ROS2_AVAILABLE = True
-except Exception as error:  # pragma: no cover - Windows/macOS development host
+except Exception as error:  # pragma: no cover - no ROS2 on the offline workstation
     rclpy = None  # type: ignore[assignment]
     Node = object  # type: ignore[assignment,misc]
     ActionClient = object  # type: ignore[assignment]

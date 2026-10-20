@@ -1,7 +1,7 @@
 """Offline "sim-VLM": deterministic scene QA over simulator ground truth.
 
 This is explicitly *not* a neural network.  It exists so the perception/VLM
-seam is exercisable on a CPU-only Windows host: the same interface is what a
+seam is exercisable on a CPU-only offline host: the same interface is what a
 Qwen2.5-VL adapter implements in a real deployment.
 """
 

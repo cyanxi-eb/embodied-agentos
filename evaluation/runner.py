@@ -9,7 +9,6 @@ import tempfile
 import time
 import zlib
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -309,6 +308,8 @@ class EvalConfig:
     cache_dir: str | None = None
     output_dir: str = "reports"
     quick: bool = False
+    #: "rule" (deterministic, default) or "llm" (OpenAI-compatible planner).
+    planner: str = "rule"
 
     def instruction_list(self) -> list[Instruction]:
         if self.instructions is not None:
@@ -341,7 +342,12 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
     # point TEMP at the repository root and pollute the working tree.
     cache_dir = config.cache_dir or _fresh_cache_dir("eval")
     runtime = AgentRuntime(
-        RuntimeConfig(scene="warehouse", cache_dir=cache_dir, persist_events=config.persist_events)
+        RuntimeConfig(
+            scene="warehouse",
+            cache_dir=cache_dir,
+            persist_events=config.persist_events,
+            planner=config.planner,
+        )
     )
     episodes: list[EpisodeResult] = []
 
@@ -361,12 +367,6 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
 
     report: dict[str, Any] = {
         "schema": "agentos-eval/v1",
-        "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "host": {
-            "python": _python_version(),
-            "cpu_count": _cpu_count(),
-            "platform": "windows-10 (development host, no GPU)",
-        },
         "config": {
             "cache_dir": _public_path(cache_dir),
             "instructions": len(instructions),
@@ -375,6 +375,7 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
             "episodes": total_main,
             "quick": config.quick,
             "persist_events": config.persist_events,
+            "planner": config.planner,
         },
         "overall": summarize(episodes),
         "by_scene": group_metrics(episodes, "scene"),
@@ -382,6 +383,9 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
         "failures": [episode.to_dict() for episode in episodes if not episode.success][:30],
         "episodes": [episode.to_dict() for episode in episodes],
     }
+    planner_stats = getattr(runtime.planner, "stats", None)
+    if planner_stats:
+        report["planner_stats"] = dict(planner_stats)
 
     # ---- fault injection: 4 fault kinds x 5 targets = 20 -------------------
     if run_faults:
@@ -409,6 +413,7 @@ def run_evaluation(config: EvalConfig, progress: Any = None) -> dict[str, Any]:
                 scene="warehouse",
                 cache_dir=_fresh_cache_dir("ablation"),
                 persist_events=config.persist_events,
+                planner=config.planner,
             )
         )
         ablation_episodes: list[EpisodeResult] = []
@@ -627,14 +632,3 @@ def _canonical_zone(color: str, category: str) -> str:
     }
     return mapping.get((color, category), "zone_a")
 
-
-def _python_version() -> str:
-    import sys
-
-    return sys.version.split()[0]
-
-
-def _cpu_count() -> int:
-    import os
-
-    return os.cpu_count() or 1

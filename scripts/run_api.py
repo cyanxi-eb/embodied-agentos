@@ -25,7 +25,7 @@ def main() -> int:
     parser.add_argument(
         "--ros2",
         action="store_true",
-        help="use the rclpy backend (requires Ubuntu 24.04 + ROS2 Jazzy; not run on the dev host)",
+        help="use the rclpy backend (requires Ubuntu 24.04 + ROS2 Jazzy; not run on this offline workstation)",
     )
     args = parser.parse_args()
 
@@ -36,7 +36,7 @@ def main() -> int:
         from agentos.ros2_bridge import ROS2_AVAILABLE
 
         if not ROS2_AVAILABLE:
-            print("--ros2 requested but rclpy is not importable on this host; aborting honestly.")
+            print("--ros2 requested but rclpy is not importable in this environment; aborting honestly.")
             return 2
         raise SystemExit(
             "ROS2 backend wiring requires a running Nav2 stack; see docs/ros2_integration.md "

@@ -8,7 +8,7 @@ variables and is **never** used by the test suite:
     AGENTOS_VLM_MODEL      e.g. Qwen2.5-VL-7B-Instruct
     AGENTOS_VLM_TIMEOUT_S  default 15
 
-On the development host (Windows, no GPU, no model server) the adapter reports
+In this offline setup (no GPU, no model server) the adapter reports
 ``available == False`` and raises a clear error instead of pretending to work.
 """
 

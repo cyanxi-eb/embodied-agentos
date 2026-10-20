@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_ros2_import_guard_is_explicit():
-    # This host is Windows without ROS2: the adapter must import cleanly and say why.
+    # This environment has no ROS2: the adapter must import cleanly and say why.
     assert ROS2_AVAILABLE is False
     assert ROS2_IMPORT_ERROR
     with pytest.raises(RuntimeError, match="rclpy is not available"):

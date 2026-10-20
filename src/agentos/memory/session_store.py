@@ -43,7 +43,7 @@ class SessionStore:
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
         self._conn = sqlite3.connect(self.path, check_same_thread=False)
-        # WAL + NORMAL keeps per-event commits cheap on Windows (fsync is the
+        # WAL + NORMAL keeps per-event commits cheap on local disks (fsync is the
         # bottleneck for a 450-episode evaluation); events are diagnostic data,
         # not a durability-critical ledger.
         self._conn.execute("PRAGMA journal_mode=WAL")

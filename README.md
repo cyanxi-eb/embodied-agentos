@@ -184,6 +184,19 @@ MCP 侧用 `python -m agentos.mcp_server.server` 起来，工具是 `list_skills
 
 复现命令和门槛见 [`docs/evaluation.md`](docs/evaluation.md)。
 
+### 6.1 真实 LLM 规划器（可选，小样本）
+
+默认是规则 planner；`--planner llm` 切到 OpenAI 兼容接口的 `LLMPlanner`，模型只出任务图，执行、后置条件校验、失败重规划还是运行时做。用 `qwen3.8-flash` 在 warehouse 场景跑了 20 条指令（1 次重复，关掉故障注入/消融/压力子集）：
+
+| 模式 | 成功率 | 规划调用 / 缓存 / 回退 | 规划时延 p50 / p95 | token（prompt + completion） |
+| --- | --- | --- | --- | --- |
+| thinking 开 | **20/20（100%）** | 21 / 2 / 0 | 22.9 s / 42.5 s | 27,722 + 22,527 |
+| thinking 关 | **17/20（85%）** | 29 / 2 / 0 | 7.1 s / 13.0 s | 38,435 + 13,426 |
+
+成功判定仍是评测器对世界状态的独立检查，不是模型自报；两次实验「运行时/评测器不一致」都是 0。thinking 开时推理 token 占 completion 大头，延迟高但重规划少；关掉后 p95 降到 13 s，代价是重规划调用变多、3 条指令失败（L13/L15 `NOT_FOUND`、L17 `PRECONDITION_FAILED`）。根因是当前 prompt 没把 replan 失败码 / 已搜索区域喂回模型，重规划容易重复同一份计划——这是下一步要补的第一件事，不是运行时校验漏了。
+
+数据在 [`reports/live_llm/`](reports/live_llm/) 与 [`reports/live_llm_nothink/`](reports/live_llm_nothink/)，配置、命令和限制见 [`docs/live_llm.md`](docs/live_llm.md)。
+
 ## 7. Demo 复现
 
 ```powershell

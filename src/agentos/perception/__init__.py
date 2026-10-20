@@ -7,7 +7,7 @@ Two backends are provided:
   50x3x3 evaluation use, so numbers are reproducible on a 2-core CPU.
 * ``OpenAICompatVLM``: a real HTTP adapter for a Qwen2.5-VL style OpenAI-compatible
   endpoint.  It is **not** exercised by the test suite (no credentials, no GPU on
-  the development host) and is documented as such in the README.
+  this offline workstation) and is documented as such in the README.
 """
 
 from agentos.perception.base import PerceptionBackend, VLMBackend

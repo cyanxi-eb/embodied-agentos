@@ -33,6 +33,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed-salt", type=int, default=0)
     parser.add_argument("--no-faults", action="store_true", help="skip the 20 fault-injection episodes")
     parser.add_argument("--no-ablation", action="store_true", help="skip the verify/replan ablation")
+    parser.add_argument("--no-stress", action="store_true", help="skip the 120-episode stress subset")
+    parser.add_argument("--planner", choices=["rule", "llm"], default="rule", help="planner backend (llm needs AGENTOS_PLANNER_API_KEY)")
     parser.add_argument("--persist-events", action="store_true", help="write every trace event to SQLite")
     parser.add_argument("--out", default="reports")
     parser.add_argument("--cache-dir", default=None)
@@ -49,10 +51,12 @@ def main(argv: list[str] | None = None) -> int:
         instructions=instructions,
         run_faults=not args.no_faults,
         run_ablation=not args.no_ablation,
+        run_stress=not args.no_stress,
         persist_events=args.persist_events,
         cache_dir=args.cache_dir,
         output_dir=args.out,
         quick=args.quick,
+        planner=args.planner,
     )
 
     started = time.perf_counter()
