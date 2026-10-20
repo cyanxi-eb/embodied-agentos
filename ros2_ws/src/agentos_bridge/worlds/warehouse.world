@@ -7,8 +7,8 @@
   charging dock in the north-east corner.
 
   Note: the repository ships this file as .world (SDF XML). Loading it requires a
-  Linux host with Gazebo Harmonic; the development host (Windows, no Gazebo) does
-  not execute this world - see docs/ros2_integration.md.
+  Linux machine with Gazebo Harmonic; this world has only been XML-structure
+  checked, not loaded - see docs/ros2_integration.md.
 -->
 <sdf version="1.9">
   <world name="warehouse">

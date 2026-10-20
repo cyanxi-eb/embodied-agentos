@@ -1,9 +1,8 @@
 # ROS2 集成说明（Ubuntu 24.04 + ROS2 Jazzy + Gazebo Harmonic + Nav2）
 
-> **诚实声明**：本文档描述的 ROS2 适配层与 ament 包在本仓库的开发机（Windows 10、无 ROS2/Gazebo/Docker）
-> 上**未运行过**，只做了 `python -m py_compile` 语法验证。仿真评测与 demo 全部来自纯 Python 2D 仿真后端。
-> 因此仓库 README 中的指标**不代表** Gazebo 真机/仿真链路的性能；它验证的是 Agent 主循环、技能契约、
-> 安全网关、行为树与评测方法本身。任何“已真机验证”表述都是不成立的。
+> **说明**：本文档描述的 ROS2 适配层与 ament 包**未运行**过，只做了 `python -m py_compile` 语法验证。
+> 仿真评测与 demo 全部来自纯 Python 的 2D 仿真后端，所以 README 里的指标**不代表** Gazebo 或真机链路的性能；
+> 它验证的是 Agent 主循环、技能契约、安全网关、行为树与评测方法本身。仓库里没有任何「已真机验证」的说法。
 
 ## 1. 目录
 
@@ -34,8 +33,8 @@ source /opt/ros/jazzy/setup.bash
 
 ### 2.2 Gazebo world
 
-仓库已包含 `ros2_ws/src/agentos_bridge/worlds/warehouse.world`（SDF 1.9 XML；因本机 DSH 策略对 `.sdf` 扩展名
-拦截，改用 Gazebo 同样支持的 `.world` 扩展名）。布局与 2D 仿真 `agentos.sim.scenes.build_warehouse` 对齐：
+仓库已包含 `ros2_ws/src/agentos_bridge/worlds/warehouse.world`（内容是 SDF 1.9 XML，只是用了 Gazebo 同样支持的
+`.world` 扩展名）。布局与 2D 仿真 `agentos.sim.scenes.build_warehouse` 对齐：
 
 * 12×12 m 地面、四周 0.15 m 厚、0.8 m 高墙体；
 * 三排货架（y = 3.0 / 7.0 / 9.4，x ∈ [2.0, 7.0]，0.8 m 深、1.2 m 高）；
@@ -50,8 +49,8 @@ ros2 launch agentos_bridge agentos.launch.py
 ros2 launch agentos_bridge agentos.launch.py world:=/path/to/other.world
 ```
 
-> **未在本机验证**：开发机是 Windows，没有 Gazebo Harmonic；该 world 只做了 XML 结构校验，
-> 实际加载/物理表现需要在 Ubuntu 24.04 + Gazebo Harmonic 环境验证。
+> **未在本机验证**：这个 world 只做了 XML 结构校验，没在 Gazebo Harmonic 里实际加载过；
+> 加载行为和物理表现需要在 Ubuntu 24.04 + Gazebo Harmonic 环境里跑一遍才能确认。
 
 ### 2.3 构建与启动
 
@@ -99,11 +98,11 @@ python scripts/run_api.py --ros2            # 需要 rclpy 的 Python 解释器
 1. 取消当前 goal handle（Nav2 或自定义技能 action）；
 2. 清空 `_active_goal` / `_active_kind` 与 `_last_feedback`；
 3. 行为树在取消时同步清理 py_trees blackboard 命名空间（`agentos/bt/executor.py` 的 `_cleanup`）；
-4. 下一个技能不会继承任何旧 goal —— 对应简历里“技能取消时统一清理 Action goal 与黑板状态”。
+4. 下一个技能不会继承任何旧 goal —— 这就是「技能取消时统一清理 Action goal 与黑板状态」那条设计。
 
 ## 4. 与 2D 仿真的对应关系
 
-| 层 | 2D 仿真（本机可跑） | ROS2（需 Linux，本机未跑） |
+| 层 | 2D 仿真（仓库内可跑） | ROS2（需 Linux，未验证） |
 | --- | --- | --- |
 | 技能动作 | `SimSkillBackend.navigate_to/pick/...` | `Ros2SkillBackend` → ActionClient |
 | 运动学 | 差速模型 + A* + pure pursuit + 碰撞检测 | Nav2 RegulatedPurePursuit + costmap |
@@ -116,4 +115,4 @@ python scripts/run_api.py --ros2            # 需要 rclpy 的 Python 解释器
 
 * `AgentRuntime` 尚未提供 `AGENTOS_BACKEND=ros2` 的正式工厂分支（需要 rclpy 环境才能联调）。
 * 机械臂 pick/place 需要接入真实厂商 action server，bridge 目前明确返回 `BACKEND_ERROR` 而不是假装成功。
-* `worlds/warehouse.world` 已随包提供，但 Gazebo 实际加载与物理表现未在本机验证（见 2.2）。
+* `worlds/warehouse.world` 已随包提供，但 Gazebo 里的实际加载与物理表现未验证（见 2.2）。

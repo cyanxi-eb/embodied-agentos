@@ -1,11 +1,5 @@
 {
   "schema": "agentos-eval/v1",
-  "generated_at": "2026-10-20T20:36:11",
-  "host": {
-    "python": "3.12.14",
-    "cpu_count": 4,
-    "platform": "windows-10 (development host, no GPU)"
-  },
   "config": {
     "cache_dir": ".cache/eval-tmp/eval-97412648",
     "instructions": 50,

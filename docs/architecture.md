@@ -1,5 +1,7 @@
 # 架构说明
 
+这份文档讲代码怎么分层、主循环怎么跑、失败怎么兜。为什么这么设计看 [`design_decisions.md`](design_decisions.md)，踩过的坑看 [`failure_cases.md`](failure_cases.md)。
+
 ## 1. 分层与职责
 
 | 层 | 代码 | 职责 | 不负责 |
@@ -11,7 +13,7 @@
 | 后端 | `sim/`, `ros2_bridge/` | 运动学、导航、抓取放置、Action/Service 适配 | 不做安全判断（网关在前） |
 | 记忆/观测 | `memory/`, `trace/` | Qdrant 场景/任务/物体记忆、SQLite 会话、JSONL trace | 不参与控制 |
 
-依赖方向自上而下；`sim` 与 `ros2_bridge` 实现同一个 `RobotBackend` 接口，所以技能层、行为树、安全网关、主循环都不需要知道后端是仿真还是 ROS2。
+依赖方向从上往下；`sim` 与 `ros2_bridge` 实现同一个 `RobotBackend` 接口，所以技能层、行为树、安全网关、主循环都不用知道后面接的是仿真还是 ROS2。
 
 ## 2. LangGraph 主循环
 
@@ -65,7 +67,7 @@ Selector("skill_execution")
 7. 电子围栏（默认矩形 + 支持自定义多边形），越界 → `OUT_OF_BOUNDS`；
 8. 速度类参数裁剪 + `filter_velocity` 限幅。
 
-网关不修改世界状态，拒绝无副作用（有单测）。
+网关不改世界状态，拒绝也不留副作用（有单测兜着）。
 
 ## 5. 数据流示例（一次取物）
 

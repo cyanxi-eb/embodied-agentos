@@ -1,8 +1,8 @@
 """Bring up Gazebo + robot + Nav2 + the AgentOS skill bridge.
 
 Verified sequence is documented in docs/ros2_integration.md.  This launch file is
-part of the (not-yet-run) ROS2 deliverable: the development host is Windows and
-cannot execute it.
+part of the (not-yet-run) ROS2 deliverable: no ROS2/Gazebo installation was
+available to execute it.
 """
 
 from launch import LaunchDescription

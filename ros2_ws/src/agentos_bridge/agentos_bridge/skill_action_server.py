@@ -9,7 +9,7 @@ This node is the robot-side half of ``agentos.ros2_bridge.Ros2SkillBackend``:
 * navigation is *not* re-implemented here: pick/approach/dock delegate to Nav2
   through an ``ActionClient`` on ``navigate_to_pose``
 
-Not executed on the Windows development host; see ``docs/ros2_integration.md``.
+Not executed in the reference environment; see ``docs/ros2_integration.md``.
 """
 
 from __future__ import annotations

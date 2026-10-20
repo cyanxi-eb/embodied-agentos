@@ -4,7 +4,7 @@
   <name>agentos_interfaces</name>
   <version>0.1.0</version>
   <description>AgentOS skill/estop interface definitions (action + service).</description>
-  <maintainer email="cyanxi-eb@users.noreply.github.com">陈彦希</maintainer>
+  <maintainer email="cyanxi-eb@users.noreply.github.com">cyanxi-eb</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

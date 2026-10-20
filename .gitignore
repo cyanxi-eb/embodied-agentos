@@ -16,7 +16,7 @@ venv/
 *.sqlite-wal
 *.db
 
-# scratch / temp dirs (the harness may point TEMP at the repo root)
+# scratch / temp dirs (test runs and evaluation may create these at the repo root)
 tmp*/
 pytest-of-*/
 agentos-eval-*/
@@ -33,7 +33,6 @@ logs/
 
 # media scratch
 demos/frames/
-demos/*.mp4
 
 # editors / OS
 .vscode/

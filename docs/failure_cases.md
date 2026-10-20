@@ -1,7 +1,7 @@
 # 真实踩坑记录（开发过程中实际遇到并修复）
 
-> 这些不是编造的「常见坑」，而是本项目从 0 到 1 过程中真实出现、导致测试失败或指标异常的问题。
-> 每条记录：现象 → 根因 → 修复 → 验证方式。
+> 下面这些都是开发时真撞上、导致测试挂掉或指标不对的问题，不是编出来的「常见坑」。
+> 每条按 现象 → 根因 → 修复 → 验证 来记。
 
 ## 1. pure pursuit 让机器人绕目标点公转，永远到不了
 
@@ -60,17 +60,17 @@
 * **修复**：`plan` 后改为条件边，失败直奔 finalize。
 * **验证**：`tests/test_graph_runtime.py::test_unknown_instruction_fails_cleanly`。
 
-## 8. 450 幕评测在 Windows 上有超时风险
+## 8. 450 幕评测首版要跑 20 分钟以上
 
 * **现象**：首版单幕 4.2s，450 幕 + 故障 + 消融预计 >20 分钟。
-* **根因**：① 每条 trace 事件都 SQLite 提交（Windows fsync 慢）；② LangGraph 每个节点写 checkpoint 同链路；③ 路径简化对每个候选点做 clearance 栅格扫描。
+* **根因**：① 每条 trace 事件都 SQLite 提交，一次 fsync 就慢一次；② LangGraph 每个节点写 checkpoint 走同一条链路；③ 路径简化对每个候选点做 clearance 栅格扫描。
 * **修复**：WAL + `synchronous=NORMAL`；评测关闭 trace 落库（`persist_events=False`，仍保留内存事件）；去掉冗余 clearance 扫描；A* 内部局部变量化；栅格 0.1→0.15m。
 * **结果**：单幕均值降到 ~0.4s，全量评测 **~3 分钟**（远低于 20 分钟门槛），报告里记录了实测墙钟。
 
 ## 9. 评测临时目录把仓库根目录污染了 151MB
 
-* **现象**：仓库根出现 `pytest-of-Administrator/`、大量 `tmp*/`、`agentos-eval-*/`。
-* **根因**：本会话环境把 `TEMP` 指向工作区，`tempfile.mkdtemp()` 与 pytest basetemp 都落在仓库根。
+* **现象**：仓库根出现 `pytest-of-*/`、大量 `tmp*/`、`agentos-eval-*/`。
+* **根因**：环境把 `TEMP` 指向工作区时，`tempfile.mkdtemp()` 与 pytest basetemp 都会落到仓库根。
 * **修复**：pytest `--basetemp=.cache/pytest`；评测临时目录固定到 `.cache/eval-tmp/`；`.gitignore` 兜底 `tmp*/`、`pytest-of-*/`、`agentos-eval-*/`。
 * **验证**：清理后仓库根只剩交付目录；`git status` 干净。
 

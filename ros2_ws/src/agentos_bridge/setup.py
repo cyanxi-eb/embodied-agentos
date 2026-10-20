@@ -16,7 +16,7 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="陈彦希",
+    maintainer="cyanxi-eb",
     maintainer_email="cyanxi-eb@users.noreply.github.com",
     description="Embodied AgentOS skill action server bridging skills to Nav2 / hardware",
     license="MIT",

@@ -9,7 +9,7 @@ description = "Embodied AgentOS: natural-language task -> skill plan -> simulate
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "陈彦希", email = "cyanxi-eb@users.noreply.github.com" }]
+authors = [{ name = "cyanxi-eb" }]
 keywords = ["embodied-ai", "agent", "langgraph", "ros2", "behavior-tree", "robotics"]
 
 [project.optional-dependencies]
