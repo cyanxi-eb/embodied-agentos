@@ -246,6 +246,11 @@ def render_markdown(report: dict[str, Any]) -> str:
                 ]
             )
         lines.append("\n" + _table(["扰动场景", "说明", "幕数", "成功率", "重规划幕数", "重规划恢复率(%)"], rows))
+        lines.append(
+            "\n> 注：压力子集里的 `EVALUATOR_MISMATCH` 主要是「改写措辞」场景——规则 planner 把模糊说法解析成了另一个"
+            "（可执行但不正确的）任务并成功完成，运行时会自报成功，而评测器按原意图判定失败。这是语言理解能力的真实差距，"
+            "不是后置条件校验漏洞（标准 450 幕的 mismatch 为 0）。\n"
+        )
 
     lines.append("\n## 8. 失败案例清单（最多 30 条）\n")
     failures = report.get("failures", [])

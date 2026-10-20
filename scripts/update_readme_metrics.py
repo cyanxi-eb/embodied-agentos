@@ -39,7 +39,7 @@ def build_table(report: dict) -> str:
     if stress:
         rows.append(
             (
-                "压力/泛化场景成功率（30 指令 × 3 类扰动）",
+                "压力/泛化场景成功率（30 指令 × 4 类扰动）",
                 f"**{stress['overall']['success_rate']}%**（{stress['overall']['success']}/{stress['overall']['episodes']}）",
             )
         )

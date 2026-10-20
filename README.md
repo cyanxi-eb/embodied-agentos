@@ -34,6 +34,27 @@
 
 <!-- METRICS:START -->
 
+| 指标 | 实测值 |
+| --- | --- |
+| 评测规模 | 50 条指令 × 3 场景 × 3 次 = 450 幕 |
+| 任务闭环成功率（评测器判定） | **100.0%**（450/450） |
+| 运行时自报成功率 | 100.0%（450/450） |
+| 重规划恢复率 | **100.0%**（6/6 次重规划后成功） |
+| 故障注入恢复率 | **100.0%**（20/20，4 类故障 × 5 目标） |
+| 消融：关闭 verify+replan（干净场景 / 故障注入） | 96.0% / **37.5%** |
+| 规划时延 p50 / p95 | 13.015 / 51.46 ms |
+| 技能决策时延 p50 / p95 | 0.095 / 0.194 ms |
+| 单幕仿真时长 p50 / p95 | 40.75 / 79.065 s |
+| 全量评测墙钟耗时 | 186.91 s |
+| 失败 bucket | {} |
+| 记忆命中率 | 66.67% |
+| 压力/泛化场景成功率（30 指令 × 4 类扰动） | **85.0%**（102/120） |
+| 　· perturbed_start | 100.0%（30 幕，重规划 0 幕） |
+| 　· moved_target | 100.0%（30 幕，重规划 6 幕） |
+| 　· noisy_perception_blocked_path | 100.0%（30 幕，重规划 0 幕） |
+| 　· paraphrased_language | 40.0%（30 幕，重规划 0 幕） |
+
+<sub>数据来源：`reports\eval_20261020_2024.json`，生成于 2026-10-20T20:23:56，主机 windows-10 (development host, no GPU)（Python 3.12.14）。本表由 `scripts/update_readme_metrics.py` 从 JSON 自动生成。</sub>
 <!-- METRICS:END -->
 
 口径说明：
@@ -107,7 +128,7 @@ flowchart TB
 uv venv --python 3.12 .venv
 uv pip install --python .venv\Scripts\python.exe -r requirements-dev.txt
 
-# 1) 测试（119 个用例，含仿真/安全/技能/行为树/LangGraph/API/MCP/评测）
+# 1) 测试（121 个用例，含仿真/安全/技能/行为树/LangGraph/API/MCP/评测）
 .\.venv\Scripts\python.exe -m pytest -q
 
 # 2) 快速评测（CI 用，约 20 秒）
@@ -157,9 +178,10 @@ ros2 launch agentos_bridge agentos.launch.py world:=/path/to/warehouse.sdf
 * **重复**：每条指令 × 每个场景 × 3 次确定性重复（种子由指令/场景/重复稳定哈希，物体位置确定性抖动）。
 * **故障注入**：`object_missing`（目标被挪到别的区域）、`path_blocked`（路径中途出现障碍）、`pick_slip`（首次抓取滑落）、`nav_timeout`（首次导航被拖慢超时）× 5 个目标 = 20 幕。
 * **消融**：关闭后置条件校验 + 关闭重规划（信任技能返回值）在干净场景与故障注入场景下的对比。
-* **压力/泛化子集**：30 条指令 × 3 类扰动场景（初始位姿扰动 / 目标被挪走 / 15% 感知漏检+0.12m 定位噪声+路径阻断）× 1 次 = 90 幕，
-  用同一 runner 与同一评测器判定，结果写入同一 JSON 的 `stress` 字段——用于回答「为什么标准场景成功率这么高」。
-  标准场景是确定性规划器 + 干净世界，压力场景才是更接近真实部署的分布。
+* **压力/泛化子集**：30 条指令 × 4 类扰动场景（初始位姿扰动 / 目标被挪走 / 15% 感知漏检+0.12m 定位噪声+路径阻断 /
+  **改写与省略措辞**）× 1 次 = 120 幕，用同一 runner 与同一评测器判定，结果写入同一 JSON 的 `stress` 字段——
+  用于回答「为什么标准场景成功率这么高」。标准场景是确定性规划器 + 干净世界；压力场景里语言改写是主要失败来源
+  （规则 planner 的词表覆盖有限），这正是下一步接 LLM planner 的动机。
 * **指标**：成功率（含评测器独立判定）、重规划恢复率、规划/决策/执行时延 p50/p95、单幕仿真时长、失败 bucket、失败案例清单、记忆命中率。
 * 报告：`reports/eval_*.json`（唯一数据源）+ `reports/eval_*.md` + `reports/eval_*.png`；README 指标表由 `scripts/update_readme_metrics.py` 从 JSON 自动生成，杜绝手抄漂移。
 
@@ -226,13 +248,13 @@ embodied-agentos/
 ├── ros2_ws/src/       # agentos_bridge（ament_python）+ agentos_interfaces（action/service）
 ├── evaluation/        # 50 条指令、runner、报告生成
 ├── scripts/           # run_eval / run_api / record_demo / replay_trace / update_readme_metrics
-├── tests/             # 119 个 pytest 用例
+├── tests/             # 121 个 pytest 用例
 ├── demos/             # 3 段 GIF + 真实 trace JSONL
 ├── reports/           # 评测 JSON / Markdown / 图表
 └── docs/              # architecture / evaluation / failure_cases / design_decisions / ros2_integration
 ```
 
-版本：`0.1.0`（首个可复现实测版本）。测试：`pytest` 119 passed；全量评测：见 `reports/`。
+版本：`0.1.0`（首个可复现实测版本）。测试：`pytest` 121 passed；全量评测：见 `reports/`。
 
 ## 许可
 

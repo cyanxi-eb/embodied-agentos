@@ -23,6 +23,7 @@ agentos-eval-*/
 agentos-ablation-*/
 scratch/
 reports_test/
+reports-ci/
 *.log
 
 # evaluation raw logs (reports/**/*.json is committed on purpose)

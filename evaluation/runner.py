@@ -475,7 +475,29 @@ STRESS_VARIANTS: list[dict[str, Any]] = [
         "sim": {"perception_dropout_p": 0.15, "perception_noise_m": 0.12},
         "fault_kind": "path_blocked",
     },
+    {
+        "name": "paraphrased_language",
+        "description": "改写/省略措辞：物体类别与目的地用同义/模糊说法（如“物件”“那边”），检验语言泛化",
+        "sim": {},
+        "fault_kind": None,
+        "language": True,
+    },
 ]
+
+
+_AMBIGUOUS_CATEGORY_WORDS = ("盒子", "杯子", "球", "包裹", "工具", "瓶子")
+_AMBIGUOUS_DEST_WORDS = ("工作站台", "工作台", "充电桩", "餐桌", "样品交接台", "交接台")
+
+
+def paraphrase_instruction(text: str) -> str:
+    """Rewrite an instruction with vague references: the rule parser will mis-plan
+    some of them - that is exactly the language-generalisation gap being measured."""
+    result = text
+    for word in _AMBIGUOUS_CATEGORY_WORDS:
+        result = result.replace(word, "物件")
+    for word in _AMBIGUOUS_DEST_WORDS:
+        result = result.replace(word, "那边")
+    return result
 
 
 def _goal_objects(goal: dict[str, Any]) -> list[dict[str, Any]]:
@@ -518,6 +540,15 @@ def run_stress_evaluation(config: EvalConfig, progress: Any = None) -> dict[str,
         )
         variant_episodes: list[EpisodeResult] = []
         for instruction in instructions:
+            episode_instruction = instruction
+            if variant.get("language"):
+                episode_instruction = Instruction(
+                    id=f"{instruction.id}-para",
+                    text=paraphrase_instruction(instruction.text),
+                    intent=instruction.intent,
+                    goal=instruction.goal,
+                    object_zone=instruction.object_zone,
+                )
             fault = None
             if variant["fault_kind"]:
                 objects = _goal_objects(instruction.goal)
@@ -528,7 +559,8 @@ def run_stress_evaluation(config: EvalConfig, progress: Any = None) -> dict[str,
                     target = ""
                     fault_kind = "path_blocked"
                 fault = FaultSpec(kind=fault_kind, target=target)
-            episode = run_episode(runtime, instruction, "warehouse", 0, fault=fault)
+            episode = run_episode(runtime, episode_instruction, "warehouse", 0, fault=fault)
+            episode.instruction_id = instruction.id
             episode.intent = f"stress:{variant['name']}:{episode.intent}"
             episode.fault = fault.to_dict() if fault else None
             variant_episodes.append(episode)
