@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Embodied AgentOS · 调试台</title>
+<style>
+  :root { --bg:#0f1419; --panel:#171e26; --line:#26303b; --text:#d7e0ea; --muted:#8ba0b3; --accent:#4d9bff; --ok:#37b26c; --warn:#e0a13a; --err:#d9534f; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: ui-monospace, "Cascadia Code", Consolas, "Microsoft YaHei", monospace; background:var(--bg); color:var(--text); font-size:13px; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:16px; margin:0; letter-spacing:.5px; }
+  .pill { padding:2px 8px; border-radius:10px; font-size:11px; background:#1f2a35; color:var(--muted); }
+  main { display:grid; grid-template-columns: 380px 1fr; gap:14px; padding:14px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  h2 { font-size:12px; color:var(--muted); margin:0 0 10px; text-transform:uppercase; letter-spacing:1px; }
+  label { display:block; color:var(--muted); font-size:11px; margin:8px 0 3px; }
+  input, select, textarea { width:100%; background:#0c1116; color:var(--text); border:1px solid var(--line); border-radius:5px; padding:7px; font-family:inherit; font-size:12px; }
+  textarea { resize:vertical; min-height:56px; }
+  button { background:#22303d; color:var(--text); border:1px solid var(--line); border-radius:5px; padding:7px 12px; cursor:pointer; font-family:inherit; font-size:12px; margin:8px 6px 0 0; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button.danger { border-color:#5a2a2a; color:#ff9a9a; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  #tasks .task { border:1px solid var(--line); border-radius:6px; padding:8px; margin-bottom:8px; cursor:pointer; }
+  #tasks .task.active { border-color:var(--accent); background:#12202f; }
+  .row { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+  .muted { color:var(--muted); font-size:11px; }
+  .status { padding:1px 7px; border-radius:8px; font-size:11px; }
+  .s-finished{background:#14351f;color:var(--ok)} .s-failed{background:#3a1717;color:var(--err)}
+  .s-cancelled{background:#2e1f3a;color:#c79cf0} .s-paused{background:#3a2c12;color:var(--warn)}
+  .s-running{background:#122b45;color:var(--accent)} .s-created{background:#1f2a35;color:var(--muted)}
+  #events { height: 62vh; overflow:auto; background:#0c1116; border:1px solid var(--line); border-radius:6px; padding:8px; font-size:11.5px; line-height:1.55; }
+  .ev { border-bottom:1px solid #1b242e; padding:3px 0; }
+  .ev .t { color:#6f8aa5; }
+  .ev.plan{color:#c9d6e3} .ev.skill_dispatch{color:#8fc2ff} .ev.skill_result{color:#a8e6c1}
+  .ev.verify{color:#c2d98b} .ev.fail{color:#ff9b9b} .ev.replan{color:#ffcf7a} .ev.safety{color:#ff7b7b}
+  #meta { margin-top:8px; color:var(--muted); font-size:11px; white-space:pre-wrap; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Embodied AgentOS · 调试台</h1>
+  <span class="pill" id="health">connecting…</span>
+  <span class="pill">LangGraph Plan-and-Act · py_trees · Safety Gateway</span>
+</header>
+<main>
+  <div>
+    <section>
+      <h2>新建任务</h2>
+      <label>自然语言指令</label>
+      <textarea id="instruction">把货架区A的红色盒子拿到工作站台</textarea>
+      <div class="grid2">
+        <div><label>场景</label><select id="scene"><option>warehouse</option><option>lab</option><option>home</option></select></div>
+        <div><label>seed</label><input id="seed" type="number" value="3"/></div>
+      </div>
+      <label style="margin-top:8px">调试节流（ms/节点，仅用于演示暂停）</label>
+      <input id="delay" type="number" value="60" min="0" max="2000"/>
+      <button class="primary" id="create">提交任务</button>
+      <button class="danger" id="estop">急停</button>
+      <button id="reset">复位急停</button>
+    </section>
+    <section style="margin-top:14px">
+      <h2>任务列表</h2>
+      <div id="tasks" class="muted">暂无任务</div>
+    </section>
+  </div>
+  <div>
+    <section>
+      <div class="row">
+        <h2 id="current-title">实时 Trace</h2>
+        <div>
+          <button id="pause">暂停</button>
+          <button id="resume">恢复</button>
+          <button id="cancel" class="danger">取消</button>
+        </div>
+      </div>
+      <div id="events"><div class="muted">选择或创建一个任务…</div></div>
+      <div id="meta"></div>
+    </section>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let current = null;
+let source = null;
+const esc = (v) => String(v).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const TERMINAL = new Set(["finished","failed","cancelled"]);
+
+async function health() {
+  try {
+    const r = await fetch("/healthz"); const j = await r.json();
+    $("health").textContent = `planner=${j.planner} · memory=${j.memory_backend}(${j.memory_items}) · skills=${j.skills}`;
+  } catch (e) { $("health").textContent = "backend unreachable"; }
+}
+
+async function refreshTasks() {
+  const r = await fetch("/tasks"); const j = await r.json();
+  const box = $("tasks");
+  if (!j.tasks.length) { box.textContent = "暂无任务"; return; }
+  box.innerHTML = j.tasks.map(t => `
+    <div class="task ${t.id===current?'active':''}" data-id="${t.id}">
+      <div class="row"><span class="muted">${t.id}</span><span class="status s-${t.status}">${t.status}</span></div>
+      <div>${esc(t.instruction)}</div>
+      <div class="muted">${t.scene} · seed ${t.seed} · ${new Date(t.created_at*1000).toLocaleTimeString()}</div>
+    </div>`).join("");
+  box.querySelectorAll(".task").forEach(el => el.onclick = () => selectTask(el.dataset.id));
+}
+
+function evClass(type) {
+  if (type === "plan" || type === "plan_validated") return "plan";
+  if (type.startsWith("skill") || type === "bt_event") return type === "skill_result" ? "skill_result" : "skill_dispatch";
+  if (type === "postcondition" || type === "finish") return "verify";
+  if (type.includes("fail") || type === "unplannable") return "fail";
+  if (type.includes("replan") || type === "pause_requested" || type === "resumed") return "replan";
+  if (type.includes("safety") || type.includes("estop")) return "safety";
+  return "";
+}
+
+function renderEvent(ev) {
+  const box = $("events");
+  const div = document.createElement("div");
+  div.className = "ev " + evClass(ev.type);
+  let extra = "";
+  if (ev.type === "plan") extra = ` replanned=${ev.replanned} nodes=${(ev.nodes||[]).length} ${ev.notes?ev.notes.join(","):""}`;
+  else if (ev.type === "skill_dispatch") extra = ` ${ev.skill} #${ev.plan_index} ${JSON.stringify(ev.params)}`;
+  else if (ev.type === "skill_result") extra = ` ${ev.skill} ok=${ev.ok} code=${ev.code} attempts=${ev.attempts}`;
+  else if (ev.type === "postcondition") extra = ` ${ev.skill} verified=${ev.verified}`;
+  else if (ev.type === "skill_failed") extra = ` ${ev.skill} ${ev.code} attempts=${ev.attempts} replan=${ev.replan}`;
+  else if (ev.type === "replan_scheduled") extra = ` replans=${ev.next_replans}`;
+  else if (ev.type === "finish") extra = ` ${ev.status} goal=${ev.goal_verified} replans=${ev.replans}`;
+  else if (ev.type === "safety_rejected") extra = ` ${ev.skill} ${ev.code} ${ev.reason}`;
+  else if (ev.type === "bt_event") extra = ` ${ev.kind} ${ev.detail||""}`;
+  div.innerHTML = `<span class="t">[${ev.seq}]</span> <b>${ev.type}</b>${esc(extra)}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  $("current-title").textContent = `实时 Trace · ${current}`;
+}
+
+function selectTask(id) {
+  current = id === current ? null : id;
+  if (!current) { if (source) source.close(); return; }
+  $("events").innerHTML = "";
+  $("meta").textContent = "";
+  refreshTasks();
+  if (source) source.close();
+  source = new EventSource(`/events/${current}`);
+  source.onmessage = (e) => { try { renderEvent(JSON.parse(e.data)); } catch (err) {} };
+  ["plan","skill_dispatch","skill_result","postcondition","skill_failed","replan_scheduled","finish","safety_rejected","pause_requested","resumed"].forEach(t => {
+    source.addEventListener(t, (e) => { try { renderEvent(JSON.parse(e.data)); } catch (err) {} });
+  });
+  source.onerror = () => { setTimeout(() => { if (current) selectTask(current); }, 500); };
+  setTimeout(refreshMeta, 300);
+}
+
+async function refreshMeta() {
+  if (!current) return;
+  try {
+    const r = await fetch(`/tasks/${current}`); const t = await r.json();
+    $("meta").textContent = `status=${t.status} plan_index=${t.plan_index} replans=${t.replans} goal_verified=${t.goal_verified}\n` + (t.failure ? `failure=${JSON.stringify(t.failure)}` : "");
+  } catch (e) {}
+}
+
+async function createTask() {
+  const body = { instruction: $("instruction").value, scene: $("scene").value, seed: Number($("seed").value), step_delay_ms: Number($("delay").value) };
+  const r = await fetch("/tasks", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  if (!r.ok) { alert(await r.text()); return; }
+  const t = await r.json();
+  await refreshTasks();
+  if (source) source.close();
+  current = t.id;
+  selectTask(t.id);
+}
+
+$("create").onclick = createTask;
+$("pause").onclick = async () => { if (current) { await fetch(`/tasks/${current}/pause`, {method:"POST"}); refreshMeta(); } };
+$("resume").onclick = async () => { if (current) { await fetch(`/tasks/${current}/resume`, {method:"POST"}); refreshMeta(); } };
+$("cancel").onclick = async () => { if (current) { await fetch(`/tasks/${current}/cancel`, {method:"POST"}); refreshMeta(); } };
+$("estop").onclick = async () => {
+  if (!current) { alert("请先选择一个任务"); return; }
+  await fetch("/safety/estop", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({reason:"console emergency stop", session_id: current}) });
+};
+$("reset").onclick = async () => {
+  const operator = prompt("操作员 ID", "operator-1"); if (!operator) return;
+  const code = prompt("复位码 (默认 AGENTOS-RESET)", "AGENTOS-RESET"); if (!code) return;
+  const r = await fetch("/safety/reset", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({operator_id: operator, code: code, session_id: current}) });
+  alert(JSON.stringify(await r.json()));
+};
+setInterval(refreshTasks, 1500);
+setInterval(refreshMeta, 1500);
+health(); refreshTasks();
+</script>
+</body>
+</html>

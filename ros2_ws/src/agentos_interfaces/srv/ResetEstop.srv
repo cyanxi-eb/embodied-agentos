@@ -1,0 +1,6 @@
+# Operator e-stop reset ceremony: identity + reset code, never a bare UI click.
+string operator_id
+string code
+---
+bool ok
+string message

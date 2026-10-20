@@ -1,0 +1,10 @@
+# AgentOS generic skill action executed by the robot-side bridge.
+# One action covers all non-navigation skills so the interface stays versionable.
+string skill_name
+string params_json      # JSON object following the skill's params_schema
+float32 timeout_s
+---
+bool ok
+string result_json      # JSON: {"ok": bool, "code": str, "detail": str, "data": {...}}
+---
+string feedback_json
