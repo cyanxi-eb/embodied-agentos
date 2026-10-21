@@ -248,6 +248,7 @@ class RuleBasedPlanner(PlannerBackend):
             FailureCode.CANCELLED.value,
             FailureCode.UNKNOWN_SKILL.value,
             FailureCode.PLAN_INVALID.value,
+            FailureCode.UNSUPPORTED.value,
         }:
             raise UnplannableError(f"failure {code} is not replannable")
         recoverable = {

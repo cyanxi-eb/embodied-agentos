@@ -39,6 +39,10 @@ class FailureCode(str, enum.Enum):
     UNPLANNABLE = "UNPLANNABLE"
     BACKEND_ERROR = "BACKEND_ERROR"
     NOT_HOLDING = "NOT_HOLDING"
+    #: The selected body physically has no such capability (e.g. a fixed-base
+    #: arm has no navigation).  Added with the multi-body adapters; the wire
+    #: format is unchanged because ``FailureCode`` is still a string enum.
+    UNSUPPORTED = "UNSUPPORTED"
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return self.value
@@ -67,6 +71,7 @@ FATAL_CODES: frozenset[FailureCode] = frozenset(
         FailureCode.UNKNOWN_SKILL,
         FailureCode.LOW_BATTERY,
         FailureCode.PLAN_INVALID,
+        FailureCode.UNSUPPORTED,
     }
 )
 
