@@ -5,7 +5,9 @@
 **一句话定位**：一条中文长指令进来，走「任务图 Plan-and-Act → 8 类机器人技能 → 行为树执行 → 安全网关 → 确定性 2D 仿真 → 后置条件校验 → 失败重规划」整条链路的具身 Agent 运行时。
 评测数字都是在这份仓库里实测出来的，可以复现；ROS2 / Gazebo 适配层和 ament 包代码给全了，但没在真装了 ROS2 的机器上跑过。
 
-> 个人项目 · 2026.06 – 2026.10 · MIT License
+> 公司项目 · 2026.06 – 2026.09 · MIT License
+
+> **开源整理版**：内部版本在公司内网，不含客户数据与私有协议；这里用公开 ROS2 接口复现评测。
 
 ---
 
@@ -119,6 +121,7 @@ flowchart TB
 3. **后置条件的最终权威在图节点**：行为树或技能自报成功都不算数，`verify_postcondition` 仍然对世界状态独立求值一次。
 4. **暂停只发生在技能边界**（`dispatch_skill`），checkpoint 里存的是一致的世界快照，所以恢复能跨进程。
 5. **取消统一清理**：Nav2/技能 action goal 和 py_trees 黑板命名空间一起清。
+6. **换设备只换适配层**：`backends/` 用名字注册表切设备，任务图、8 个技能、行为树、安全网关和评测器都不 import 具体适配器；`tests/test_adapters.py` 用同一张 6 节点任务图跑三个本体。
 
 ## 4. 快速开始
 
@@ -129,7 +132,7 @@ flowchart TB
 uv venv --python 3.12 .venv
 uv pip install --python .venv\Scripts\python.exe -r requirements-dev.txt
 
-# 1) 测试（121 个用例，覆盖仿真/安全/技能/行为树/LangGraph/API/MCP/评测）
+# 1) 测试（129 个用例，覆盖仿真/安全/技能/行为树/LangGraph/API/MCP/评测/异构适配器）
 .\.venv\Scripts\python.exe -m pytest -q
 
 # 2) 快速评测（CI 用，约 20 秒）
@@ -154,6 +157,31 @@ ros2 launch agentos_bridge agentos.launch.py   # 默认加载包内 worlds/wareh
 ```
 
 完整步骤、话题/Action/Service 契约、QoS、world 内容见 [`docs/ros2_integration.md`](docs/ros2_integration.md)。
+
+### 4.3 异构本体适配层（轮式人形 / 复合移动 / 六轴协作臂）
+
+`src/agentos/backends/` 用 `RobotBackend` + `Ros2Transport` 把三个本体的差异收在一层，
+任务图、8 个技能、行为树、安全网关和评测器都不感知设备：
+
+| 差异层 | 轮式人形（X1 类） | 复合移动协作（AMR + 臂） | 六轴协作臂（固定基座） |
+| --- | --- | --- | --- |
+| 通信 | Action `/humanoid/nav_to` | Action `/amr/navigate` + Service `/arm/move` | Action `/arm/follow_joint_trajectory` |
+| 动作语义 | 全向，可原地转向 | 非全向，后退目标需显式 `reverse` 标记 | 无导航能力 → `UNSUPPORTED` |
+| 单位/坐标 | 相对机体（m + rad） | 世界坐标（mm），适配器边界换算 | 关节空间（rad） |
+
+配置切设备：
+
+```python
+from agentos.backends import make_backend
+
+backend = make_backend("mobile_manipulator")  # 轮式人形: "wheeled_humanoid"；六轴臂: "arm6"
+```
+
+同一张任务图在三个后端上的节点/边数一致（6 节点 / 5 条依赖边），由
+`tests/test_adapters.py::test_same_task_graph_across_backends` 断言；三个本体的三层差异、
+失败码映射与“新增一个品牌”的步骤见 [`docs/adapters.md`](docs/adapters.md)。
+真实 `RclpyTransport` 与真机都没在离线环境执行过，适配器测试走的是记录 wire payload 的
+`FakeRos2Transport`。
 
 ## 5. 技能清单（8 类，MCP 暴露）
 
@@ -226,6 +254,7 @@ MCP 侧用 `python -m agentos.mcp_server.server` 起来，工具是 `list_skills
 先把不成立的部分说清楚：
 
 * ROS2 / Gazebo / Nav2 适配层和 ament 包没跑过，只做了 `python -m compileall` 语法验证；真机也没上。仓库里所有性能/成功率数字都来自 2D 仿真，**不代表** Gazebo 或真机。
+* 三个异构本体适配器（`backends/`）用 `FakeRos2Transport` 做了 wire payload 级测试（接口名、单位/坐标系、`reverse` 标志、`UNSUPPORTED` 降级）；真实 `RclpyTransport` 与真机同样没跑过，不能把适配器测试当成真机验证。
 * 评测用的 Planner 是**确定性规则规划器**，不是 LLM。`LLMPlanner`（OpenAI 兼容）和 `OpenAICompatVLM`（Qwen2.5-VL 风格）作为可选真实后端实现了，但不参与测试和指标。
 * VLM 是「sim-VLM」，直接读仿真真值（可以注入噪声/漏检），不是神经网络视觉模型。
 * 记忆用 Qdrant local 加确定性 hashing embedding（不下载模型），不是语义 embedding。
@@ -246,6 +275,7 @@ embodied-agentos/
 ├── src/agentos/
 │   ├── graph/         # LangGraph 状态机、任务图、规则/LLM planner、runtime（checkpoint/pause/resume）
 │   ├── skills/        # 8 技能契约（JSON Schema + 前后置 + 失败码）+ registry
+│   ├── backends/      # RobotBackend + 三个本体适配器（人形/复合移动/六轴臂）+ 设备注册表
 │   ├── bt/            # py_trees 行为树（retry / backtrack / request replan）
 │   ├── safety/        # SafetyGateway（限速/闩锁急停/超时/围栏/拒绝名单）
 │   ├── sim/           # 12×12 场景、A*、pure pursuit、差速底盘、故障注入、渲染
@@ -258,14 +288,14 @@ embodied-agentos/
 ├── ros2_ws/src/       # agentos_bridge（ament_python）+ agentos_interfaces（action/service）
 ├── evaluation/        # 50 条指令、runner、报告生成
 ├── scripts/           # run_eval / run_api / record_demo / replay_trace / 指标表同步
-├── tests/             # 121 个 pytest 用例
+├── tests/             # 129 个 pytest 用例
 ├── demos/             # 3 段 GIF + mp4 + 真实 trace JSONL
 ├── assets/            # 封面图
 ├── reports/           # 评测 JSON / Markdown / 图表
-└── docs/              # architecture / evaluation / failure_cases / design_decisions / ros2_integration
+└── docs/              # architecture / evaluation / failure_cases / design_decisions / ros2_integration / adapters
 ```
 
-版本 `0.1.0`，第一个可复现实测的版本。测试 `pytest` 121 passed；全量评测见 `reports/`。
+版本 `0.1.0`，第一个可复现实测的版本。测试 `pytest` 129 passed；全量评测见 `reports/`。
 
 ## 许可
 
